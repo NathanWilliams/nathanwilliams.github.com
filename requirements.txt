@@ -1,2 +1,2 @@
-pelican
+pelican[Markdown]
 ghp-import

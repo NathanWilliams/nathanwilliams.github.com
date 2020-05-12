@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 AUTHOR = u'Nathan Williams'
 SITENAME = u'Brownian Motion'
-SITEURL = ''
+SITEURL = 'https://nathanwilliams.github.io'
 GITHUB_URL = 'https://github.com/NathanWilliams/'
 
 TIMEZONE = 'Australia/Sydney'
@@ -24,8 +24,8 @@ DEFAULT_PAGINATION = 10
 ARTICLE_URL = '{date:%Y}/{date:%m}/{date:%d}/{slug}/'
 ARTICLE_SAVE_AS = '{date:%Y}/{date:%m}/{date:%d}/{slug}/index.html'
 THEME='foundation-default-colours'
-PLUGIN_PATH = '/Users/nathan/Sites/pelican-plugins'
-PLUGINS = ['summary']
+PLUGIN_PATHS = ['../pelican-plugins']
+PLUGINS = []
 
 GOOGLE_ANALYTICS='UA-38967315-1'
 

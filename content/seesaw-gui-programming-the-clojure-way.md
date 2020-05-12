@@ -35,7 +35,7 @@ With the REPL up, type the following to bring up the finished product:
 
 You should get the following window:
 
-![Anvil View]({filename}/images/anvilview.png)
+![Anvil View]({static}/images/anvilview.png)
 
 So by now you may have realised that GUI layout is not my strong point!
 The interface is ugly, but functional.
