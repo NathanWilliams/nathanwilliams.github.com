@@ -15,17 +15,24 @@ pelican-themes --install ../pelican-themes/foundation-default-colours --verbose
 - in the parent directory
 ```git clone --recursive https://github.com/getpelican/pelican-plugins```
 
+## Dev server
+Start up a local server to check how everything looks
+```
+make devserver
+```
+Open: http://localhost:8000
+
 
 ## Render pages
+Render the blog into the output directory
 ```
 make html
 ```
 
-## Dev server
+## Publish to GitHub
+Copy the files in the output directory to the master branch (where my GitHub page displays from) and then push to github
 ```
-make devserver
+ghp-import output -b master -p
 ```
-
-http://localhost:8000
 
 
