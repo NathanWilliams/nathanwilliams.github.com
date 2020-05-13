@@ -23,17 +23,7 @@ make devserver
 Open: http://localhost:8000
 
 
-## Render pages
-Render the blog into the output directory
+## Build, publish onto the master branch and push the master branch to github
+```bash
+make html && ghp-import output -b master -p
 ```
-make html
-```
-
-## Publish to GitHub
-Copy the files in the output directory to the master branch (where my GitHub page displays from) and then push to github
-```
-ghp-import output -b master -p
-```
-
-## Post commit hook
-I have now added a post-commit hook so my blog is updated everytime I make a commit on this branch!

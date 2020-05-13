@@ -24,7 +24,7 @@ DEFAULT_PAGINATION = 10
 ARTICLE_URL = '{date:%Y}/{date:%m}/{date:%d}/{slug}/'
 ARTICLE_SAVE_AS = '{date:%Y}/{date:%m}/{date:%d}/{slug}/index.html'
 THEME='foundation-default-colours'
-PLUGIN_PATHS = ['../pelican-plugins']
+PLUGIN_PATHS = []
 PLUGINS = []
 
 GOOGLE_ANALYTICS='UA-38967315-1'
