@@ -25,4 +25,4 @@ jobs:
       - name: Build
         run: make html
       - name: Publish
-        run: ghp-import output -b testing -p
+        run: ghp-import output -b master -p
