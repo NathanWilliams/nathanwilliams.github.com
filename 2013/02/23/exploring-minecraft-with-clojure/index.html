@@ -1,0 +1,267 @@
+<!doctype html>
+<html class="no-js" lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<title>Brownian Motion</title>
+		<meta name="description" content="">
+		<meta name="author" content="Nathan Williams">
+
+		<link rel="stylesheet" href="https://nathanwilliams.github.io/theme/css/foundation.css" />
+		<link rel="stylesheet" href="https://nathanwilliams.github.io/theme/css/pygment/monokai.css" />
+		<link rel="stylesheet" href="https://nathanwilliams.github.io/theme/css/custom.css" />
+
+
+		<script src="https://nathanwilliams.github.io/theme/js/modernizr.js"></script>
+
+		<!-- Feeds -->
+
+<script>var _gaq=[['_setAccount','UA-38967315-1'],['_trackPageview']];(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src='//www.google-analytics.com/ga.js';s.parentNode.insertBefore(g,s)}(document,'script'))</script>
+
+		<!-- mathjax config similar to math.stackexchange -->
+		<script type="text/x-mathjax-config">
+		MathJax.Hub.Config({
+			jax: ["input/TeX", "output/HTML-CSS"],
+			tex2jax: {
+				inlineMath: [ ['$', '$'] ],
+				displayMath: [ ['$$', '$$']],
+				processEscapes: true,
+				skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+			},
+			messageStyle: "none",
+			"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+		});
+		</script>
+		<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+	</head>
+	<body>
+		<div class="off-canvas-wrap">
+			<div class="inner-wrap">
+				<!-- mobile top bar to activate nav -->
+				<nav class="tab-bar show-for-small">
+					<section class="left-small">
+						<a class="left-off-canvas-toggle menu-icon" ><span></span></a>
+					</section>
+
+					<section class="middle tab-bar-section">
+						<h1 class="title">Brownian&nbsp;Motion</h1>
+					</section>
+				</nav>
+
+				<!-- mobile side bar nav -->
+				<aside class="left-off-canvas-menu">
+					<ul class="off-canvas-list">
+						<li><a href="https://nathanwilliams.github.io">Home</a></li>
+						<li><label>Categories</label></li>
+							<li ><a href="https://nathanwilliams.github.io/category/blog.html">blog</a></li>
+							<li class="active"><a href="https://nathanwilliams.github.io/category/programming.html">programming</a></li>
+
+						<li><label>Links</label></li>
+							<li><a href="https://github.com/NathanWilliams/">GitHUb repo</a></li>
+
+
+						<li><label>Monthly Archives</label></li>
+									<li><a href="/2016/07/index.html">July 2016 (1)</a></li>
+									<li><a href="/2014/02/index.html">February 2014 (1)</a></li>
+									<li><a href="/2013/05/index.html">May 2013 (1)</a></li>
+									<li><a href="/2013/04/index.html">April 2013 (2)</a></li>
+									<li><a href="/2013/02/index.html">February 2013 (3)</a></li>
+
+						<li><label>Social</label></li>
+					</ul>	
+				</aside>
+
+				<!-- top bar nav -->
+				<nav class="top-bar hide-for-small-only" data-topbar>
+					<ul class="title-area">
+						<li class="name">
+							<h1><a href="https://nathanwilliams.github.io/">Brownian Motion</a></h1>
+						</li>
+					</ul>
+
+					<section class="top-bar-section">
+						<ul class="left">
+								<li ><a href="https://nathanwilliams.github.io/category/blog.html">blog</a></li>
+								<li class="active"><a href="https://nathanwilliams.github.io/category/programming.html">programming</a></li>
+						</ul>
+                        <ul class="right">                                                                                                                                           
+                                                                                                                                             
+                        </ul>  
+					</section>
+				</nav>
+
+				<!-- Main Page Content and Sidebar -->
+				<section class="main-section">
+					<div class="row">
+						<!-- Main Content -->
+						<div class="medium-9 small-12 columns" role="content">
+<article>
+	<h2>Exploring Minecraft with Clojure</h2>
+	<p>After years of ignoring it, I have become hooked on Minecraft after a single try.
+Looking from the outside, all you see is a low resolution, blocky world; but jump in and you find yourself in a vast, detailed expanse.</p>
+<p>The low resolution fades before your eyes.
+Like a good book, your imagination fills the gaps, you don't see a lego shaped hill, you see a mountain forged through eons of time.</p>
+<p>Before you know what has happened, you have made a mark on that world.
+You own it, you mold it, you get a feel for the lay of the land, you push boundries and find them surprisingly maleable.
+The pieces might be simple, but the outcome is rich and intricate.</p>
+<p>I find something deeply similar with Clojure.
+From the outside you see a strange syntax, terse and compact, you wonder how anything can be done in it.
+Where is the required boilerplate you need to paste in, where is the dense documentation to wade through?</p>
+<p>But you jump in anyway.
+You struggle at first, your previous experience didn't prepared you for this, but you see something special, so you persist.
+Before you know it, you have made something interesting, and the result is elegant and compact.</p>
+<p>The strange syntax fades, and you don't miss the verbosity you once thought was necessary to achieve impressive feats.</p>
+<h2>Exploration</h2>
+<p>So how does this journey begin you ask?
+Like any good Clojure task, we are going to start from low level building blocks and compose our way to something bigger.
+The starting point of this expedition is in reading the <a href="http://mc.kev009.com/NBT" title="The NBT spec on the MinecraftCoalition wiki">Named Binary Tag</a> data structure that is used extensively in Minecraft data files and network communications.
+<!-- PELICAN_END_SUMMARY --></p>
+<h2>The NBT format</h2>
+<p>NBT is a simple binary format that stores data tagged by type, and unless part of list, they are also named.
+Here is a simple example of a (decoded) NBT structure:</p>
+<div class="highlight"><pre><span></span><span class="err">TAG_Compound(&#39;hello world&#39;): 1 entry</span>
+<span class="err">{</span>
+<span class="err">    TAG_String(&#39;name&#39;): &#39;Bananrama&#39;</span>
+<span class="err">}</span>
+</pre></div>
+
+
+<p>On disk, this file looks like this:</p>
+<div class="highlight"><pre><span></span><span class="err">0000000 0a 00 0b 68 65 6c 6c 6f 20 77 6f 72 6c 64 08 00</span>
+<span class="err">0000010 04 6e 61 6d 65 00 09 42 61 6e 61 6e 72 61 6d 61</span>
+<span class="err">0000020 00                                             </span>
+<span class="err">0000021</span>
+</pre></div>
+
+
+<p>The format allows more than just a flat group of objects, elements can be nested inside compound and list data structures to an arbitrary depth.</p>
+<p>Here is a more complex example:</p>
+<div class="highlight"><pre><span></span><span class="err"> TAG_Compound(&#39;Level&#39;): 11 entries</span>
+<span class="err"> {</span>
+<span class="err">   TAG_Compound(&#39;nested compound test&#39;): 2 entries</span>
+<span class="err">   {</span>
+<span class="err">     TAG_Compound(&#39;egg&#39;): 2 entries</span>
+<span class="err">     {</span>
+<span class="err">       TAG_String(&#39;name&#39;): &#39;Eggbert&#39;</span>
+<span class="err">       TAG_Float(&#39;value&#39;): 0.5</span>
+<span class="err">     }</span>
+<span class="err">     TAG_Compound(&#39;ham&#39;): 2 entries</span>
+<span class="err">     {</span>
+<span class="err">       TAG_String(&#39;name&#39;): &#39;Hampus&#39;</span>
+<span class="err">       TAG_Float(&#39;value&#39;): 0.75</span>
+<span class="err">     }</span>
+<span class="err">   }</span>
+<span class="err">   TAG_Int(&#39;intTest&#39;): 2147483647</span>
+<span class="err">   TAG_Byte(&#39;byteTest&#39;): 127</span>
+<span class="err">   TAG_String(&#39;stringTest&#39;): &#39;HELLO WORLD THIS IS A TEST STRING \xc3\x85\xc3\x84\xc3\x96!&#39;</span>
+<span class="err">   TAG_List(&#39;listTest (long)&#39;): 5 entries</span>
+<span class="err">   {</span>
+<span class="err">     TAG_Long(None): 11</span>
+<span class="err">     TAG_Long(None): 12</span>
+<span class="err">     TAG_Long(None): 13</span>
+<span class="err">     TAG_Long(None): 14</span>
+<span class="err">     TAG_Long(None): 15</span>
+<span class="err">   }</span>
+<span class="err">   TAG_Double(&#39;doubleTest&#39;): 0.49312871321823148</span>
+<span class="err">   TAG_Float(&#39;floatTest&#39;): 0.49823147058486938</span>
+<span class="err">   TAG_Long(&#39;longTest&#39;): 9223372036854775807L</span>
+<span class="err">   TAG_List(&#39;listTest (compound)&#39;): 2 entries</span>
+<span class="err">   {</span>
+<span class="err">     TAG_Compound(None): 2 entries</span>
+<span class="err">     {</span>
+<span class="err">       TAG_Long(&#39;created-on&#39;): 1264099775885L</span>
+<span class="err">       TAG_String(&#39;name&#39;): &#39;Compound tag #0&#39;</span>
+<span class="err">     }</span>
+<span class="err">     TAG_Compound(None): 2 entries</span>
+<span class="err">     {</span>
+<span class="err">       TAG_Long(&#39;created-on&#39;): 1264099775885L</span>
+<span class="err">       TAG_String(&#39;name&#39;): &#39;Compound tag #1&#39;</span>
+<span class="err">     }</span>
+<span class="err">   }</span>
+<span class="err">   TAG_Byte_Array(&#39;byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))&#39;): [1000 bytes]</span>
+<span class="err">   TAG_Short(&#39;shortTest&#39;): 32767</span>
+<span class="err"> }</span>
+</pre></div>
+
+
+<p>I'm not going to cover the entire NBT specification, as it is already well covered on the <a href="http://mc.kev009.com/NBT" title="The NBT spec on the MinecraftCoalition wiki">MinecraftCoalition wiki page</a>.</p>
+<p>There are however a few gotchas that might trip you up along the way.</p>
+<ul>
+<li>TAG_Byte_Array &amp; TAG_Int_Array don't hold tagged data, only raw bytes / integers.</li>
+<li>Every tag starts with a single byte for type id.</li>
+<li>Tags contain a string name, which is the same structure as a TAG_String, just without the string tag id.</li>
+<li>TAG_List breaks the above two rules (tag id and name) for its immediate child nodes. 
+  A TAG_List contains the tag id for its child objects, so all direct decendant nodes are of the same type, and a signed integer indicating the number of elements in the list.</li>
+</ul>
+<h2>Conclusion</h2>
+<p>I know we haven't covered any Clojure yet, but I wanted to get the basics out of the way first, so we can jump into code without having to go back and forth constantly.
+The next entry we will look at reading a simple NBT file, covering the bare minimum, and then building from there.</p>
+<h2>Feedback</h2>
+<p>You may have noticed the lack of comments on this blog.</p>
+<p>This is a concious decision, but it doesn't mean I don't want feedback.
+If you see something wrong from typos and grammer to bad coding practices, I want to know!</p>
+<p>This blog is hosted on <a href="https://github.com/NathanWilliams/nathanwilliams.github.com/tree/source" title="Blog source tree">GitHub</a> so feel free to fork it, make corrections and issue a pull request.
+You can also raise a ticket to suggest improvements, or ask for clarification on anything I haven't explained clearly.</p>
+	<hr/>
+	<h6>Written by <a href="https://nathanwilliams.github.io/author/nathan-williams.html">Nathan Williams</a> in <a href="https://nathanwilliams.github.io/category/programming.html">programming</a> on Sat 23 February 2013. Tags: <a href="https://nathanwilliams.github.io/tag/clojure.html">Clojure</a>, <a href="https://nathanwilliams.github.io/tag/minecraft.html">Minecraft</a>, <a href="https://nathanwilliams.github.io/tag/nbt.html">NBT</a>, </h6>
+</article>
+
+<hr/>
+						</div>
+						<!-- End Main Content -->
+						<!-- Sidebar -->
+						<aside class="medium-3 hide-for-small-only columns">
+							<div class="panel">
+								<h5>Links</h5>
+								<ul class="side-nav">
+									<li><a href="https://github.com/NathanWilliams/">GitHUb repo</a></li>
+								</ul>
+							</div>
+
+							<div class="panel">
+								<h5>Tags</h5>
+								<ul class="tag-cloud">
+								</ul>
+							</div>
+
+							<div class="panel">
+								<h5>Monthly Archives</h5>
+								<ul class="side-nav">
+											<li><a href="/2016/07/index.html">July 2016 (1)</a></li>
+											<li><a href="/2014/02/index.html">February 2014 (1)</a></li>
+											<li><a href="/2013/05/index.html">May 2013 (1)</a></li>
+											<li><a href="/2013/04/index.html">April 2013 (2)</a></li>
+											<li><a href="/2013/02/index.html">February 2013 (3)</a></li>
+								</ul>
+							</div>
+
+							<div class="panel">
+								<h5>Social</h5>
+								<ul class="side-nav">
+								</ul>
+							</div>
+						</aside>
+						<!-- End Sidebar -->
+					</div>
+
+					<!-- Footer -->
+					<footer class="row">
+						<div class="medium-9 small-12">
+							<hr/>
+							<p class="text-center">Powered by <a href="http://getpelican.com">Pelican</a> and <a href="http://foundation.zurb.com/">Zurb Foundation</a>. Theme by <a href="http://hamaluik.com">Kenton Hamaluik</a>.</p>
+						</div>
+					</footer>
+					<!-- End Footer -->
+				</section>
+				<a class="exit-off-canvas"></a>
+			</div><!--off-canvas inner-->
+		</div><!--off-canvas wrap-->
+
+		<script src="https://nathanwilliams.github.io/theme/js/jquery.js"></script>
+		<script src="https://nathanwilliams.github.io/theme/js/foundation.min.js"></script>
+		<script>
+			$(document).foundation();
+		</script>
+	</body>
+</html>

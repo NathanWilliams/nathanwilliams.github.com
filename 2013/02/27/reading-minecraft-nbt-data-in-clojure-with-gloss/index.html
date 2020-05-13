@@ -1,0 +1,390 @@
+<!doctype html>
+<html class="no-js" lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<title>Brownian Motion</title>
+		<meta name="description" content="">
+		<meta name="author" content="Nathan Williams">
+
+		<link rel="stylesheet" href="https://nathanwilliams.github.io/theme/css/foundation.css" />
+		<link rel="stylesheet" href="https://nathanwilliams.github.io/theme/css/pygment/monokai.css" />
+		<link rel="stylesheet" href="https://nathanwilliams.github.io/theme/css/custom.css" />
+
+
+		<script src="https://nathanwilliams.github.io/theme/js/modernizr.js"></script>
+
+		<!-- Feeds -->
+
+<script>var _gaq=[['_setAccount','UA-38967315-1'],['_trackPageview']];(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src='//www.google-analytics.com/ga.js';s.parentNode.insertBefore(g,s)}(document,'script'))</script>
+
+		<!-- mathjax config similar to math.stackexchange -->
+		<script type="text/x-mathjax-config">
+		MathJax.Hub.Config({
+			jax: ["input/TeX", "output/HTML-CSS"],
+			tex2jax: {
+				inlineMath: [ ['$', '$'] ],
+				displayMath: [ ['$$', '$$']],
+				processEscapes: true,
+				skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+			},
+			messageStyle: "none",
+			"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+		});
+		</script>
+		<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+	</head>
+	<body>
+		<div class="off-canvas-wrap">
+			<div class="inner-wrap">
+				<!-- mobile top bar to activate nav -->
+				<nav class="tab-bar show-for-small">
+					<section class="left-small">
+						<a class="left-off-canvas-toggle menu-icon" ><span></span></a>
+					</section>
+
+					<section class="middle tab-bar-section">
+						<h1 class="title">Brownian&nbsp;Motion</h1>
+					</section>
+				</nav>
+
+				<!-- mobile side bar nav -->
+				<aside class="left-off-canvas-menu">
+					<ul class="off-canvas-list">
+						<li><a href="https://nathanwilliams.github.io">Home</a></li>
+						<li><label>Categories</label></li>
+							<li ><a href="https://nathanwilliams.github.io/category/blog.html">blog</a></li>
+							<li class="active"><a href="https://nathanwilliams.github.io/category/programming.html">programming</a></li>
+
+						<li><label>Links</label></li>
+							<li><a href="https://github.com/NathanWilliams/">GitHUb repo</a></li>
+
+
+						<li><label>Monthly Archives</label></li>
+									<li><a href="/2016/07/index.html">July 2016 (1)</a></li>
+									<li><a href="/2014/02/index.html">February 2014 (1)</a></li>
+									<li><a href="/2013/05/index.html">May 2013 (1)</a></li>
+									<li><a href="/2013/04/index.html">April 2013 (2)</a></li>
+									<li><a href="/2013/02/index.html">February 2013 (3)</a></li>
+
+						<li><label>Social</label></li>
+					</ul>	
+				</aside>
+
+				<!-- top bar nav -->
+				<nav class="top-bar hide-for-small-only" data-topbar>
+					<ul class="title-area">
+						<li class="name">
+							<h1><a href="https://nathanwilliams.github.io/">Brownian Motion</a></h1>
+						</li>
+					</ul>
+
+					<section class="top-bar-section">
+						<ul class="left">
+								<li ><a href="https://nathanwilliams.github.io/category/blog.html">blog</a></li>
+								<li class="active"><a href="https://nathanwilliams.github.io/category/programming.html">programming</a></li>
+						</ul>
+                        <ul class="right">                                                                                                                                           
+                                                                                                                                             
+                        </ul>  
+					</section>
+				</nav>
+
+				<!-- Main Page Content and Sidebar -->
+				<section class="main-section">
+					<div class="row">
+						<!-- Main Content -->
+						<div class="medium-9 small-12 columns" role="content">
+<article>
+	<h2>Reading Minecraft NBT data in Clojure with Gloss</h2>
+	<p>So far we have covered what makes up an NBT file in <a href="http://nathanwilliams.github.com/2013/02/23/exploring-minecraft-with-clojure/" title="An introduction to the NBT binary structure">Exploring Minecraft With Clojure</a> and how to read binary data in Clojure using the Gloss DSL in <a href="http://nathanwilliams.github.com/2013/02/25/first-steps-with-nbt-in-clojure/" title="An introduction to reading binary data with Gloss">First Steps With NBT in Clojure</a></p>
+<p>Today we are going to make a parser that can read any NBT file.
+There will be more code than last time, but only a small amount of it will really be new, the rest should be easy to understand based on what we have already covered.
+<!-- PELICAN_END_SUMMARY --></p>
+<h2>Preparation</h2>
+<p>You will want to clone the repository that accompanies this post from here <a href="https://github.com/NathanWilliams/nbt-clj-reader" title="An example of reading NBT files in Clojure">nbt-clj-reader</a></p>
+<p>As before, the project comes with a devel file to make setup easy, change into the project root and type:</p>
+<div class="highlight"><pre><span></span>lein deps
+lein repl
+</pre></div>
+
+
+<p>At the Clojure REPL, type:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">ns </span><span class="nv">nbt-clj-reader.devel</span><span class="p">)</span>
+<span class="p">(</span><span class="nf">use</span> <span class="o">&#39;</span><span class="p">[</span><span class="nv">clojure.tools.namespace.repl</span> <span class="ss">:only</span> <span class="p">(</span><span class="nf">refresh</span><span class="p">)])</span>
+<span class="p">(</span><span class="nf">refresh</span><span class="p">)</span>
+</pre></div>
+
+
+<p>This gives you a "data" var, where an NBT file has already been loaded into, and a "result" var, which has the decoded value of that file.</p>
+<h2>The new stuff</h2>
+<p>As mentioned earlier, a lot of the new code should be obvious from what was covered in the previous post.
+For example <em>tag-type</em> has simply been expanded to cover all of the tags in NBT:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">defcodec</span> <span class="nv">tag-type</span> <span class="p">(</span><span class="nf">enum</span> <span class="ss">:byte</span> <span class="p">{</span><span class="ss">:TAG_End</span>        <span class="mi">0</span>
+                                <span class="ss">:TAG_Byte</span>       <span class="mi">1</span>
+                                <span class="ss">:TAG_Short</span>      <span class="mi">2</span>
+                                <span class="ss">:TAG_Int</span>        <span class="mi">3</span>
+                                <span class="ss">:TAG_Long</span>       <span class="mi">4</span>
+                                <span class="ss">:TAG_Float</span>      <span class="mi">5</span>
+                                <span class="ss">:TAG_Double</span>     <span class="mi">6</span>
+                                <span class="ss">:TAG_Byte_Array</span> <span class="mi">7</span>
+                                <span class="ss">:TAG_String</span>     <span class="mi">8</span>
+                                <span class="ss">:TAG_List</span>       <span class="mi">9</span>
+                                <span class="ss">:TAG_Compound</span>   <span class="mi">10</span>
+                                <span class="ss">:TAG_Int_Array</span>  <span class="mi">11</span><span class="p">}))</span>
+</pre></div>
+
+
+<h2>Named &amp; Unnamed codecs</h2>
+<p>The other new codecs such as <em>tag-byte</em>, <em>tag-float</em> etc are largely self explanatory, but with one big difference compared to last time, and that is that they no longer have their "name" codec defined:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">defcodec</span> <span class="nv">tag-byte</span>
+  <span class="p">(</span><span class="nf">ordered-map</span> <span class="ss">:tag-type</span>    <span class="ss">:TAG_Byte</span>
+               <span class="ss">:payload</span>     <span class="ss">:byte</span><span class="p">))</span>
+<span class="p">(</span><span class="nf">defcodec</span> <span class="nv">tag-float</span>
+  <span class="p">(</span><span class="nf">ordered-map</span> <span class="ss">:tag-type</span>    <span class="ss">:TAG_Float</span>
+               <span class="ss">:payload</span>     <span class="ss">:float32-be</span><span class="p">))</span>
+</pre></div>
+
+
+<p>The lack of name is due to the fact that a tag is nameless when used in a list.
+For all other times, when a name is used, we handle it with a wrapper codec:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">get-named-codec</span> <span class="p">[</span><span class="nv">t</span><span class="p">]</span>
+  <span class="p">(</span><span class="nf">compile-frame</span>
+    <span class="p">(</span><span class="nf">ordered-map</span>  <span class="ss">:tag-name</span>    <span class="nv">sized-string</span>
+                  <span class="ss">:payload</span> <span class="p">(</span><span class="nf">get-codec</span> <span class="nv">t</span><span class="p">))</span>
+    <span class="nb">identity </span><span class="c1">;pre-encoder</span>
+    <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">x</span><span class="p">]</span> <span class="p">(</span><span class="nb">merge </span><span class="nv">x</span> <span class="p">(</span><span class="ss">:payload</span> <span class="nv">x</span><span class="p">)))))</span>
+</pre></div>
+
+
+<p>By doing this, we can have both named and unnamed codecs without having to redefine them twice.
+This codec has some additional properties in adding a post-decoder callback (and a do-nothing pre-encoder callback).</p>
+<p>The codec that comes out of this function starts with a sized-string (the tag's name), and then the codec for that tag (using "get-codec" which we will cover later in this post).
+Doing it like this however give a result like this:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span><span class="ss">:payload</span> <span class="p">{</span><span class="ss">:payload</span> <span class="s">&quot;Bananrama&quot;</span>, <span class="ss">:tag-type</span> <span class="ss">:TAG_String</span><span class="p">}</span>, <span class="ss">:tag-name</span> <span class="s">&quot;name&quot;</span><span class="p">}</span>
+</pre></div>
+
+
+<p>When we really want something like this:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span><span class="ss">:tag-type</span> <span class="ss">:TAG_String</span>, <span class="ss">:payload</span> <span class="s">&quot;Bananrama&quot;</span>, <span class="ss">:tag-name</span> <span class="s">&quot;name&quot;</span><span class="p">}</span>
+</pre></div>
+
+
+<p>To fix this, we add a post-decoder function:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">x</span><span class="p">]</span> <span class="p">(</span><span class="nb">merge </span><span class="nv">x</span> <span class="p">(</span><span class="ss">:payload</span> <span class="nv">x</span><span class="p">)))</span>
+</pre></div>
+
+
+<p><em>get-codec</em> is a simple function that takes a tag-type enum value, and returns the codec for that tag:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">get-codec</span> <span class="p">[</span><span class="nv">t</span><span class="p">]</span>
+  <span class="p">(</span><span class="nf">t</span> <span class="p">{</span><span class="ss">:TAG_End</span>        <span class="p">(</span><span class="nf">compile-frame</span> <span class="p">[</span><span class="ss">:error</span> <span class="ss">:ErrorNoFnForEnd</span><span class="p">])</span> <span class="c1">; this should never be called</span>
+      <span class="ss">:TAG_Byte</span>       <span class="nv">tag-byte</span>
+      <span class="ss">:TAG_Short</span>      <span class="nv">tag-short</span>
+      <span class="ss">:TAG_Int</span>        <span class="nv">tag-int</span>
+      <span class="ss">:TAG_Long</span>       <span class="nv">tag-long</span>
+      <span class="ss">:TAG_Float</span>      <span class="nv">tag-float</span>
+      <span class="ss">:TAG_Double</span>     <span class="nv">tag-double</span>
+      <span class="ss">:TAG_Byte_Array</span> <span class="nv">tag-byte-array</span>
+      <span class="ss">:TAG_String</span>     <span class="nv">tag-string</span>
+      <span class="ss">:TAG_List</span>       <span class="nv">tag-list</span>
+      <span class="ss">:TAG_Compound</span>   <span class="nv">tag-compound</span>
+      <span class="ss">:TAG_Int_Array</span>  <span class="nv">tag-int-array</span><span class="p">}))</span>
+</pre></div>
+
+
+<p>In Clojure keywords act as a function for a hash-map containing them, so this function simply looks up the map and returns the desired codec.</p>
+<h2>Array codecs</h2>
+<p>A newer type of codec added is a variable length array of values.
+In NBT this comes in the form of TAG_Byte_Array and TAG_Int_Array.
+Both are prefixed with an int (4 bytes / 32 bits) which define how many items are in them (how many bytes, or ints).</p>
+<p>To handle this, we turn to the Gloss codec <em>repeated</em>, which does exactly what we want, it takes a prefixed count, and then runs the supplied codec for that many iterations.</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">defcodec</span> <span class="nv">tag-byte-array</span>
+  <span class="p">(</span><span class="nf">ordered-map</span> <span class="ss">:tag-type</span>    <span class="ss">:TAG_Byte_Array</span>
+               <span class="ss">:payload</span> <span class="p">(</span><span class="nf">repeated</span> <span class="ss">:byte</span>
+                                  <span class="ss">:prefix</span> <span class="ss">:int32-be</span><span class="p">)))</span>
+
+<span class="p">(</span><span class="nf">defcodec</span> <span class="nv">tag-int-array</span>
+  <span class="p">(</span><span class="nf">ordered-map</span> <span class="ss">:tag-type</span>    <span class="ss">:TAG_Int_Array</span>
+               <span class="ss">:payload</span> <span class="p">(</span><span class="nf">repeated</span> <span class="ss">:int32-be</span>
+                                  <span class="ss">:prefix</span> <span class="ss">:int32-be</span><span class="p">)))</span>
+</pre></div>
+
+
+<p>In these examples, the first parameter is the codec to be repeated and the second is the prefix codec defining the length of the array.
+Here the codecs are primatives, but as you will see shortly, they can be arbitrarily complex.</p>
+<h2>TAG_List and dynamic codec selection</h2>
+<p>An NBT TAG_List is defined as a list of objects that are all of the same tag, and are nameless.
+As all objects in the list are the same, their tag-id doesn't need to be repeated, and is instead prefixed to the list.</p>
+<p>So the binary layout is:</p>
+<div class="highlight"><pre><span></span><span class="p">[</span><span class="n">List</span> <span class="n">tag</span><span class="o">-</span><span class="kt">id</span><span class="p">][</span><span class="n">list</span> <span class="n">name</span> <span class="n">string</span><span class="p">][</span><span class="n">children</span> <span class="kt">id</span><span class="p">][</span><span class="n">object</span> <span class="n">count</span><span class="p">][...</span><span class="n">taggless</span><span class="p">,</span> <span class="n">nameless</span> <span class="n">objects</span><span class="p">...]</span>
+</pre></div>
+
+
+<p>We know how to read the first two parts, but we need to select the right codec for the children.
+This is handled by the <em>header</em> codec.</p>
+<p><em>header</em> takes three parameters, a codec that defines the following data (the children id in our case), a function that takes the result of the codec and returns a codec to decode the body, and a third function that takes the data to encode and returns a codec to encode it with.</p>
+<p>In the case of TAG_List, we need to combine the header codec and the repeated codec.</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">defcodec</span> <span class="nv">tag-list</span>
+  <span class="p">(</span><span class="nf">ordered-map</span> <span class="ss">:tag-type</span>  <span class="ss">:TAG_List</span>
+               <span class="ss">:payload</span> <span class="p">(</span><span class="nf">header</span> <span class="nv">tag-type</span> <span class="c1">;tag-type is a frame which maps a byte to an enum name</span>
+                                <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">t</span><span class="p">]</span> <span class="c1">;returns a repeated codec of the right length</span>
+                                  <span class="p">(</span><span class="nf">compile-frame</span>
+                                    <span class="p">(</span><span class="nf">repeated</span> <span class="p">(</span><span class="nf">get-codec</span> <span class="nv">t</span><span class="p">)</span>
+                                              <span class="ss">:prefix</span> <span class="ss">:int32-be</span><span class="p">)))</span>
+                                <span class="ss">:tag-type</span><span class="p">)))</span>
+</pre></div>
+
+
+<p>There is a lot about this codec that should seem familiar.
+The tag-type is just a constant so we can identify the data type later in clojure (and in the future to know how to encode it again), and we have already seen how <em>repeated</em> and <em>get-codec</em> work.</p>
+<p>The only thing new is <em>header</em> which we have already started to cover.
+In the tag-list codec, we use header to determine the child element type of the list, and then we use an anonymous function to build up a repeated frame for the detected codec and the count of objects.</p>
+<p>At this point you might be wondering where we read the list's tag-id and its name.
+Well list is like any other tag in NBT, and it can be a nameless &amp; tagless child of a list, so those things are determined by its parent tag, which brings us to the final tag that is the root of any NBT structure...</p>
+<h2>TAG_Compound &amp; the root object</h2>
+<p>TAG_Compound is unique in a few different ways.
+To begin with, it is the only tag that can be a root object in NBT, but it can also hold an arbirtary collection of other objects.
+Finally, it is also not determined by a prefixed count as were the arrays and the list.</p>
+<p>Instead, TAG_Compound uses a terminating byte of 0x00 to signal it is complete.</p>
+<p>This causes some problems with Gloss, as it doesn't seem to have a mechanism to handle this situation.
+Digging through the code, there is an undocumented "wrap-delimited-sequence" that sounds like it would work for this job, but it is unable to handle this specific case.</p>
+<p>I plan to cover Gloss in more detail in another post, so for now you will just have to take my word for it (or better yet, correct me!) and we will work through the solution.</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">defcodec</span> <span class="nv">tag-compound</span>
+  <span class="p">(</span><span class="nf">ordered-map</span> <span class="ss">:tag-type</span>    <span class="ss">:TAG_Compound</span>
+               <span class="ss">:payload</span> <span class="p">(</span><span class="nf">terminated-repeat</span> <span class="mi">0</span><span class="nv">x00</span>
+                          <span class="p">(</span><span class="nf">header</span> <span class="nv">tag-type</span>
+                                  <span class="nv">get-named-codec</span>
+                                  <span class="ss">:tag-type</span><span class="p">))))</span>
+</pre></div>
+
+
+<p>Following on from tag-list, there should only be one thing that stands out, and that is the "terminated-repeat" codec.</p>
+<p><em>terminated-repeat</em> is not a part of Gloss, and is instead our first custom codec. What is about to follow is not pretty, and is far from complete, but it fits the requirements and allows us to read compound tags!</p>
+<div class="highlight"><pre><span></span><span class="c1">;Future plans include having it terminate on an arbitrary delimiter length</span>
+<span class="c1">;and to support encoding (writing)</span>
+<span class="p">(</span><span class="kd">defn </span><span class="nv">terminated-repeat</span> <span class="p">[</span><span class="nv">delimiter-byte</span> <span class="nv">codec</span><span class="p">]</span>
+  <span class="s">&quot;A gloss codec that repeats a sub-codec until a terminating byte is read.</span>
+<span class="s">   This only handles a terminating byte, and can only perform reads at the moment&quot;</span>
+
+  <span class="p">(</span><span class="nf">reify</span>
+    <span class="nv">Reader</span>
+    <span class="p">(</span><span class="nf">read-bytes</span> <span class="p">[</span><span class="nv">_</span> <span class="nv">buf-seq</span><span class="p">]</span>
+      <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">byte-codec</span> <span class="p">(</span><span class="nf">compile-frame</span> <span class="ss">:byte</span><span class="p">)]</span>
+        <span class="p">(</span><span class="k">loop </span><span class="p">[</span><span class="nv">results</span> <span class="p">[]</span> 
+               <span class="nv">bufs</span> <span class="nv">buf-seq</span><span class="p">]</span>
+          <span class="p">(</span><span class="k">let </span><span class="p">[[</span><span class="nv">found</span> <span class="nv">x</span> <span class="nv">bytes</span><span class="p">]</span> <span class="p">(</span><span class="nf">read-bytes</span> <span class="nv">byte-codec</span> <span class="p">(</span><span class="nf">take-bytes</span>
+                                                         <span class="p">(</span><span class="nf">dup-bytes</span> <span class="nv">bufs</span><span class="p">)</span>
+                                                         <span class="mi">1</span><span class="p">))]</span>
+            <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nf">or</span>
+                  <span class="p">(</span><span class="nb">and </span><span class="nv">found</span> <span class="p">(</span><span class="nb">== </span><span class="nv">x</span> <span class="nv">delimiter-byte</span><span class="p">))</span>
+                  <span class="p">(</span><span class="nb">== </span><span class="mi">0</span> <span class="p">(</span><span class="nf">byte-count</span> <span class="nv">bufs</span><span class="p">)))</span>
+              <span class="p">[</span><span class="nv">true</span> <span class="nv">results</span> <span class="p">(</span><span class="nf">drop-bytes</span> <span class="nv">bufs</span> <span class="mi">1</span><span class="p">)]</span>
+              <span class="p">(</span><span class="k">let </span><span class="p">[[</span><span class="nv">success</span> <span class="nv">x</span> <span class="nv">b</span><span class="p">]</span> <span class="p">(</span><span class="nf">read-bytes</span> <span class="nv">codec</span> <span class="nv">bufs</span><span class="p">)]</span>
+                <span class="p">(</span><span class="k">if </span><span class="nv">success</span>
+                  <span class="p">(</span><span class="nf">recur</span> <span class="p">(</span><span class="nb">conj </span><span class="nv">results</span> <span class="nv">x</span><span class="p">)</span> <span class="nv">b</span><span class="p">)</span>
+                  <span class="p">[</span><span class="nv">false</span> <span class="nv">nil</span> <span class="nv">nil</span><span class="p">])))))))</span>  <span class="c1">; This is incorrect right now</span>
+    <span class="nv">Writer</span>
+    <span class="p">(</span><span class="nf">sizeof</span><span class="p">[</span><span class="nv">_</span><span class="p">]</span>
+      <span class="nv">nil</span><span class="p">)</span>
+    <span class="p">(</span><span class="nf">write-bytes</span> <span class="p">[</span><span class="nv">_</span> <span class="nv">buf</span> <span class="nv">val</span><span class="p">]</span>
+      <span class="p">(</span><span class="nf">throw</span> <span class="p">(</span><span class="nf">Exception.</span> <span class="s">&quot;write-bytes not supported&quot;</span><span class="p">)))))</span>
+</pre></div>
+
+
+<p>Lets get the flaws out of the way first:
+- It doesn't support writing data yet
+- It doesn't handle incomplete streaming data like the rest of Gloss' codecs
+- It is only designed for a single byte codec terminator</p>
+<p>I plan to add the writing side of things when I need it, and when I have more experience with that side of Gloss.
+The second point refers to the line with the comment "This is incorrect right now".
+When a Gloss codec completes successfully, it returns a vector of [true values remaining].
+When it fails due to insufficient data for the codec, it returns [false continuation data].
+By doing this, when processing streaming data, Gloss knows where to resume from, and if it is not streaming data, it can raise an error regarding insufficient bytes.</p>
+<p>I hope to get that working at some point, and I don't think it would be too difficult, but it will be a problem of having something to test against.</p>
+<p>The final flaw, being limited to a single byte codec, was a choice to keep the task simple, and as this is the only use case in NBT, I didn't see a reason to spend time on making it more general.
+This could change in the future if a need for it was found.</p>
+<p>Now that I have gotten that out of the way, a brief explaination of how this codec works.
+To start with it makes a copy of the byte-buffers, and takes a single byte.
+It compares this against the terminator, and if it matches, ir returns what it has so far.
+If it doesn't, it uses the child codec on the data once, and recurs on itself.</p>
+<p>Looking back at tag-compound, you will notice that the codec given is a <em>header</em>, so each child can be different, and is determined and processed based on their type-id.</p>
+<h2>The root of it all</h2>
+<p>So if you have been paying attention, you might have noticed that tag-compound is also missing its tag-id and name.
+As with a list, it can also be a child of a list or compound, so its name may not be needed and its tag-id would be consumed by its parent's <em>header</em> codec.</p>
+<p>To end the infinite regress, we have one final codec:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">defcodec</span> <span class="nb">root </span><span class="p">(</span><span class="nf">header</span> <span class="nv">tag-type</span>
+                       <span class="nv">get-named-codec</span>
+                       <span class="ss">:tag-type</span><span class="p">))</span>
+</pre></div>
+
+
+<p>By now this should be pretty clear.
+It will always return a tag-compound, and we could have hardcoded that in, I just thought this looked cleaner.</p>
+<h2>Conclusion</h2>
+<p>This wraps up the series of reading Minecraft NBT data, I plan to cover writing NBT data in future posts.
+I also have plans on diving into how Gloss works, as I learned a lot by digging through the source and working out how to make my own codec.</p>
+<p>If you see any mistakes, please clone the blog post (it is on GitHub), make the changes and send me a pull request.
+If you have suggestions on how I could improve, or if I didn't make something clear, raise an issue and I will do my best to answer it.</p>
+	<hr/>
+	<h6>Written by <a href="https://nathanwilliams.github.io/author/nathan-williams.html">Nathan Williams</a> in <a href="https://nathanwilliams.github.io/category/programming.html">programming</a> on Wed 27 February 2013. Tags: <a href="https://nathanwilliams.github.io/tag/clojure.html">Clojure</a>, <a href="https://nathanwilliams.github.io/tag/minecraft.html">Minecraft</a>, <a href="https://nathanwilliams.github.io/tag/nbt.html">NBT</a>, <a href="https://nathanwilliams.github.io/tag/gloss.html">Gloss</a>, </h6>
+</article>
+
+<hr/>
+						</div>
+						<!-- End Main Content -->
+						<!-- Sidebar -->
+						<aside class="medium-3 hide-for-small-only columns">
+							<div class="panel">
+								<h5>Links</h5>
+								<ul class="side-nav">
+									<li><a href="https://github.com/NathanWilliams/">GitHUb repo</a></li>
+								</ul>
+							</div>
+
+							<div class="panel">
+								<h5>Tags</h5>
+								<ul class="tag-cloud">
+								</ul>
+							</div>
+
+							<div class="panel">
+								<h5>Monthly Archives</h5>
+								<ul class="side-nav">
+											<li><a href="/2016/07/index.html">July 2016 (1)</a></li>
+											<li><a href="/2014/02/index.html">February 2014 (1)</a></li>
+											<li><a href="/2013/05/index.html">May 2013 (1)</a></li>
+											<li><a href="/2013/04/index.html">April 2013 (2)</a></li>
+											<li><a href="/2013/02/index.html">February 2013 (3)</a></li>
+								</ul>
+							</div>
+
+							<div class="panel">
+								<h5>Social</h5>
+								<ul class="side-nav">
+								</ul>
+							</div>
+						</aside>
+						<!-- End Sidebar -->
+					</div>
+
+					<!-- Footer -->
+					<footer class="row">
+						<div class="medium-9 small-12">
+							<hr/>
+							<p class="text-center">Powered by <a href="http://getpelican.com">Pelican</a> and <a href="http://foundation.zurb.com/">Zurb Foundation</a>. Theme by <a href="http://hamaluik.com">Kenton Hamaluik</a>.</p>
+						</div>
+					</footer>
+					<!-- End Footer -->
+				</section>
+				<a class="exit-off-canvas"></a>
+			</div><!--off-canvas inner-->
+		</div><!--off-canvas wrap-->
+
+		<script src="https://nathanwilliams.github.io/theme/js/jquery.js"></script>
+		<script src="https://nathanwilliams.github.io/theme/js/foundation.min.js"></script>
+		<script>
+			$(document).foundation();
+		</script>
+	</body>
+</html>

@@ -1,0 +1,292 @@
+<!doctype html>
+<html class="no-js" lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<title>Brownian Motion</title>
+		<meta name="description" content="">
+		<meta name="author" content="Nathan Williams">
+
+		<link rel="stylesheet" href="https://nathanwilliams.github.io/theme/css/foundation.css" />
+		<link rel="stylesheet" href="https://nathanwilliams.github.io/theme/css/pygment/monokai.css" />
+		<link rel="stylesheet" href="https://nathanwilliams.github.io/theme/css/custom.css" />
+
+
+		<script src="https://nathanwilliams.github.io/theme/js/modernizr.js"></script>
+
+		<!-- Feeds -->
+
+<script>var _gaq=[['_setAccount','UA-38967315-1'],['_trackPageview']];(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src='//www.google-analytics.com/ga.js';s.parentNode.insertBefore(g,s)}(document,'script'))</script>
+
+		<!-- mathjax config similar to math.stackexchange -->
+		<script type="text/x-mathjax-config">
+		MathJax.Hub.Config({
+			jax: ["input/TeX", "output/HTML-CSS"],
+			tex2jax: {
+				inlineMath: [ ['$', '$'] ],
+				displayMath: [ ['$$', '$$']],
+				processEscapes: true,
+				skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+			},
+			messageStyle: "none",
+			"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+		});
+		</script>
+		<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+	</head>
+	<body>
+		<div class="off-canvas-wrap">
+			<div class="inner-wrap">
+				<!-- mobile top bar to activate nav -->
+				<nav class="tab-bar show-for-small">
+					<section class="left-small">
+						<a class="left-off-canvas-toggle menu-icon" ><span></span></a>
+					</section>
+
+					<section class="middle tab-bar-section">
+						<h1 class="title">Brownian&nbsp;Motion</h1>
+					</section>
+				</nav>
+
+				<!-- mobile side bar nav -->
+				<aside class="left-off-canvas-menu">
+					<ul class="off-canvas-list">
+						<li><a href="https://nathanwilliams.github.io">Home</a></li>
+						<li><label>Categories</label></li>
+							<li ><a href="https://nathanwilliams.github.io/category/blog.html">blog</a></li>
+							<li class="active"><a href="https://nathanwilliams.github.io/category/programming.html">programming</a></li>
+
+						<li><label>Links</label></li>
+							<li><a href="https://github.com/NathanWilliams/">GitHUb repo</a></li>
+
+
+						<li><label>Monthly Archives</label></li>
+									<li><a href="/2016/07/index.html">July 2016 (1)</a></li>
+									<li><a href="/2014/02/index.html">February 2014 (1)</a></li>
+									<li><a href="/2013/05/index.html">May 2013 (1)</a></li>
+									<li><a href="/2013/04/index.html">April 2013 (2)</a></li>
+									<li><a href="/2013/02/index.html">February 2013 (3)</a></li>
+
+						<li><label>Social</label></li>
+					</ul>	
+				</aside>
+
+				<!-- top bar nav -->
+				<nav class="top-bar hide-for-small-only" data-topbar>
+					<ul class="title-area">
+						<li class="name">
+							<h1><a href="https://nathanwilliams.github.io/">Brownian Motion</a></h1>
+						</li>
+					</ul>
+
+					<section class="top-bar-section">
+						<ul class="left">
+								<li ><a href="https://nathanwilliams.github.io/category/blog.html">blog</a></li>
+								<li class="active"><a href="https://nathanwilliams.github.io/category/programming.html">programming</a></li>
+						</ul>
+                        <ul class="right">                                                                                                                                           
+                                                                                                                                             
+                        </ul>  
+					</section>
+				</nav>
+
+				<!-- Main Page Content and Sidebar -->
+				<section class="main-section">
+					<div class="row">
+						<!-- Main Content -->
+						<div class="medium-9 small-12 columns" role="content">
+<article>
+	<h2>First steps with NBT in Clojure</h2>
+	<p>In the <a href="http://nathanwilliams.github.com/2013/02/23/exploring-minecraft-with-clojure/" title="Exploring Minecraft with Clojure">last post</a> we covered the basics of the NBT structure.
+Now it is time to start reading a basic NBT test file.
+I am going to start with "test.nbt" provided by Markus Persson (aka Notch), and in this entry we are  going to do the bare minimum to read the file.</p>
+<p>This post assumes a working Clojure environment, including Leiningen.</p>
+<h2>Reading Binary data in Clojure</h2>
+<p>To start off, we need to decide how to read the binary files in Clojure.
+We could drop down to Java and use java.nio, but that seems so primitive...
+<!-- PELICAN_END_SUMMARY --></p>
+<h2>Enter Gloss</h2>
+<p>A better option is the <a href="https://github.com/ztellman/gloss" title="Gloss DSL">Gloss</a> DSL / library, which provides a nice, high level way of processing binary data in Clojure.</p>
+<p>With Gloss you specify what makes up a "frame" and compile it into a codec which you can use to decode or encode structured binary data.
+A frame consists of other codecs, and eventually all codecs come down to primitive values such as bytes, numbers and strings.</p>
+<p>Gloss also provides a set of codecs that handle variable length data, such as repeated.
+Instead of covering what is available in Gloss, you should have a quick look at its <a href="https://github.com/ztellman/gloss/wiki/Introduction" title="An introduction to Gloss">Introduction page</a>.</p>
+<h2>Preparation</h2>
+<p>Before we go any further, make a clone of the repo for this post here: <a href="https://github.com/NathanWilliams/nbt-basic">nbt-basic</a>
+This provides the end result to this post, but also provides the test file and some code to load it for easy experimentation in the repl.</p>
+<p>Once you clone the repository, change into the project directory, and run:</p>
+<div class="highlight"><pre><span></span>lein deps
+lein repl
+</pre></div>
+
+
+<p>From here you will want to change into the 'nbt-basic.devel' namespace, and load the 'refresh' function from the tools lib, and finally call refresh</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">ns </span><span class="nv">nbt-basic.devel</span><span class="p">)</span>
+<span class="p">(</span><span class="nf">use</span> <span class="o">&#39;</span><span class="p">[</span><span class="nv">clojure.tools.namespace.repl</span> <span class="ss">:only</span> <span class="p">(</span><span class="nf">refresh</span><span class="p">)])</span>
+<span class="p">(</span><span class="nf">refresh</span><span class="p">)</span>
+</pre></div>
+
+
+<p>This will make sure everything is loaded, and that you can easily access the already loaded data file.
+If you make any changes to the files, simply call refresh again, which will clear out the repl environment and reload any changes.</p>
+<h2>The Goal</h2>
+<p>The plan for this post is to handle the simple test.nbt file, which decoded looks something like this:</p>
+<div class="highlight"><pre><span></span><span class="err">TAG_Compound(&#39;hello world&#39;): 1 entry</span>
+<span class="err">{</span>
+<span class="err">    TAG_String(&#39;name&#39;): &#39;Bananrama&#39;</span>
+<span class="err">}</span>
+</pre></div>
+
+
+<p>The byte data looks like this:</p>
+<div class="highlight"><pre><span></span><span class="err">0a 00 0b 68 65 6c 6c 6f 20 77 6f 72 6c 64 08 00</span>
+<span class="err">04 6e 61 6d 65 00 09 42 61 6e 61 6e 72 61 6d 61</span>
+<span class="err">00</span>
+</pre></div>
+
+
+<p>Referencing back to the NBT specification on the <a href="http://mc.kev009.com/NBT" title="The NBT spec on the MinecraftCoalition wiki">MinecraftCoalition wiki page</a>, we can start to decode the data.
+Looking at the specification, we have the following:</p>
+<ul>
+<li>All files start with a TAG_Compound</li>
+<li>A TAG_Compound starts with an ID of 10 (0x0a) and is terminated by a TAG_End which has an ID of 0 (0x00)</li>
+</ul>
+<p>So lets start with the simplest thing that would work:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">defcodec</span> <span class="nv">tag-compound-ugly</span>
+  <span class="p">(</span><span class="nf">ordered-map</span>  <span class="ss">:tag-type</span> <span class="nv">tag-type</span>
+                <span class="ss">:tag-name</span> <span class="nv">sized-string</span>
+                <span class="ss">:child</span>    <span class="nv">tag-type</span>
+                <span class="ss">:payload</span>  <span class="nv">tag-string</span>
+                <span class="ss">:end</span>      <span class="ss">:byte</span><span class="p">))</span>
+</pre></div>
+
+
+<p>This codec is almost useless as it is hardcoded for this file structure only, but it serves a purpose of explaining a few Gloss concepts.</p>
+<p>At the repl, type:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">decode</span> <span class="nv">tag-compound-ugly</span> <span class="nv">data</span><span class="p">)</span>
+</pre></div>
+
+
+<p>You should get the following out:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span><span class="ss">:end</span> <span class="mi">0</span>, <span class="ss">:payload</span> <span class="p">{</span><span class="ss">:payload</span> <span class="s">&quot;Bananrama&quot;</span>, <span class="ss">:tag-name</span> <span class="s">&quot;name&quot;</span>, <span class="ss">:tag-type</span> <span class="ss">:TAG_String</span><span class="p">}</span>, <span class="ss">:child</span> <span class="ss">:TAG_String</span>, <span class="ss">:tag-name</span> <span class="s">&quot;hello world&quot;</span>, <span class="ss">:tag-type</span> <span class="ss">:TAG_Compound</span><span class="p">}</span>
+</pre></div>
+
+
+<p>If you look back at the decoded version of this file shown earlier, you should see that our codec has worked!</p>
+<p>But how did it work?
+Lets break it down into its component pieces.</p>
+<p><strong>defcodec</strong>: This simply compiles the frame and binds it to a var, and is equivalent to:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="k">def </span><span class="nb">name </span><span class="p">(</span><span class="nf">compile-frame</span> <span class="nv">body</span><span class="p">))</span>
+</pre></div>
+
+
+<p><strong>compile-frame</strong>: This takes either a single codec, a vector of codecs, a map or an <em>ordered-map</em></p>
+<ul>
+<li>A single codec can be anything from a primative (numbers, strings) to something like a <em>repeated</em> construct.</li>
+<li>A vector is ordered, and the codec will produce a vector on decode, and consume one on encode.</li>
+<li>A map is a normal Clojure map and is not ordered.
+  The order is consistent however, which is useful for working with other Gloss code, but cannot be used with an already defined binary format order.</li>
+<li>An ordered-map is a Gloss construct that allows you to use a Clojure map on encode &amp; decode, whilst maintaining the defined order.</li>
+</ul>
+<p><strong>frames</strong>: Along with codecs, a frame can take constant values, which are not taken from the binary data on decoding, and are not added on encoding.
+Instead, these are useful for providing map keys, or other constants such as an internal name, to help identification in the rest of your code.</p>
+<p>If you look at our <em>tag-compound-ugly</em>, you will see a list of keys, paired with codecs.
+All of the codecs (except for the final ":byte") are defined in the project repository that you cloned previously, in "src/nbt_basic/nbt.clj".</p>
+<p>So now we can look at how each of these codecs are defined, so we can put the whole picture together.</p>
+<p><strong>tag-type</strong></p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">defcodec</span> <span class="nv">tag-type</span> <span class="p">(</span><span class="nf">enum</span> <span class="ss">:byte</span> <span class="p">{</span><span class="ss">:TAG_String</span>     <span class="mi">8</span>
+                                <span class="ss">:TAG_Compound</span>   <span class="mi">10</span><span class="p">}))</span>
+</pre></div>
+
+
+<p>The tag-type codec uses Gloss' <em>enum</em> codec, which takes a primative codec, and converts between the raw value and what you provide.
+This allows you to turn magic values from a binary format into something readable.
+This implementation of tag-type is incomplete, only covering the two data types in the test.nbt file.</p>
+<p><strong>sized-string</strong></p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">defcodec</span> <span class="nv">sized-string</span> <span class="p">(</span><span class="nf">finite-frame</span> <span class="ss">:uint16-be</span>
+                                     <span class="p">(</span><span class="nf">string</span> <span class="ss">:utf-8</span><span class="p">)))</span>
+</pre></div>
+
+
+<p>The sized-string codec wraps a string codec in a <em>finite-frame</em>.
+The finite-frame takes a codec which returns a count of bytes, and then gives that number of bytes to its child codec, in this case a utf-8 string.
+This matches the NBT specification which marks a string (both the name of an object, and the contents of a TAG_String) with an unsigned short (16 bits / 2 bytes) in big-endian format (hence the -be postfix).</p>
+<p>And finally we have <em>tag-string</em>.</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">defcodec</span> <span class="nv">tag-string</span>
+  <span class="p">(</span><span class="nf">ordered-map</span> <span class="ss">:tag-type</span>    <span class="ss">:TAG_String</span>
+               <span class="ss">:tag-name</span>    <span class="nv">sized-string</span>
+               <span class="ss">:payload</span>     <span class="nv">sized-string</span><span class="p">))</span>
+</pre></div>
+
+
+<p>With the exception of TAG_List items (which we will cover another time), NBT tags are named.
+So a TAG_String consists of two <em>sized-string</em> codecs, one for the tag's name, and the other its contents. </p>
+<h2>Conclusion</h2>
+<p>We have covered a lot of stuff, but it doesn't feel we have gotten very far!
+That is going to change quickly, now that you have a better understanding of how Gloss works, next time we will cover a complete reader that will be able to read any NBT structure.</p>
+<h2>Feedback</h2>
+<p>As before, if you see something wrong, fork this blog post on GitHub, fix it and send me a pull request.
+If you have questions or suggestions, please raise a ticket against it and I'll get back to you.</p>
+	<hr/>
+	<h6>Written by <a href="https://nathanwilliams.github.io/author/nathan-williams.html">Nathan Williams</a> in <a href="https://nathanwilliams.github.io/category/programming.html">programming</a> on Mon 25 February 2013. Tags: <a href="https://nathanwilliams.github.io/tag/clojure.html">Clojure</a>, <a href="https://nathanwilliams.github.io/tag/minecraft.html">Minecraft</a>, <a href="https://nathanwilliams.github.io/tag/nbt.html">NBT</a>, <a href="https://nathanwilliams.github.io/tag/gloss.html">Gloss</a>, </h6>
+</article>
+
+<hr/>
+						</div>
+						<!-- End Main Content -->
+						<!-- Sidebar -->
+						<aside class="medium-3 hide-for-small-only columns">
+							<div class="panel">
+								<h5>Links</h5>
+								<ul class="side-nav">
+									<li><a href="https://github.com/NathanWilliams/">GitHUb repo</a></li>
+								</ul>
+							</div>
+
+							<div class="panel">
+								<h5>Tags</h5>
+								<ul class="tag-cloud">
+								</ul>
+							</div>
+
+							<div class="panel">
+								<h5>Monthly Archives</h5>
+								<ul class="side-nav">
+											<li><a href="/2016/07/index.html">July 2016 (1)</a></li>
+											<li><a href="/2014/02/index.html">February 2014 (1)</a></li>
+											<li><a href="/2013/05/index.html">May 2013 (1)</a></li>
+											<li><a href="/2013/04/index.html">April 2013 (2)</a></li>
+											<li><a href="/2013/02/index.html">February 2013 (3)</a></li>
+								</ul>
+							</div>
+
+							<div class="panel">
+								<h5>Social</h5>
+								<ul class="side-nav">
+								</ul>
+							</div>
+						</aside>
+						<!-- End Sidebar -->
+					</div>
+
+					<!-- Footer -->
+					<footer class="row">
+						<div class="medium-9 small-12">
+							<hr/>
+							<p class="text-center">Powered by <a href="http://getpelican.com">Pelican</a> and <a href="http://foundation.zurb.com/">Zurb Foundation</a>. Theme by <a href="http://hamaluik.com">Kenton Hamaluik</a>.</p>
+						</div>
+					</footer>
+					<!-- End Footer -->
+				</section>
+				<a class="exit-off-canvas"></a>
+			</div><!--off-canvas inner-->
+		</div><!--off-canvas wrap-->
+
+		<script src="https://nathanwilliams.github.io/theme/js/jquery.js"></script>
+		<script src="https://nathanwilliams.github.io/theme/js/foundation.min.js"></script>
+		<script>
+			$(document).foundation();
+		</script>
+	</body>
+</html>

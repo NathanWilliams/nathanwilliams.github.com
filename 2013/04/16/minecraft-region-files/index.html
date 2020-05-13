@@ -1,0 +1,409 @@
+<!doctype html>
+<html class="no-js" lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<title>Brownian Motion</title>
+		<meta name="description" content="">
+		<meta name="author" content="Nathan Williams">
+
+		<link rel="stylesheet" href="https://nathanwilliams.github.io/theme/css/foundation.css" />
+		<link rel="stylesheet" href="https://nathanwilliams.github.io/theme/css/pygment/monokai.css" />
+		<link rel="stylesheet" href="https://nathanwilliams.github.io/theme/css/custom.css" />
+
+
+		<script src="https://nathanwilliams.github.io/theme/js/modernizr.js"></script>
+
+		<!-- Feeds -->
+
+<script>var _gaq=[['_setAccount','UA-38967315-1'],['_trackPageview']];(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src='//www.google-analytics.com/ga.js';s.parentNode.insertBefore(g,s)}(document,'script'))</script>
+
+		<!-- mathjax config similar to math.stackexchange -->
+		<script type="text/x-mathjax-config">
+		MathJax.Hub.Config({
+			jax: ["input/TeX", "output/HTML-CSS"],
+			tex2jax: {
+				inlineMath: [ ['$', '$'] ],
+				displayMath: [ ['$$', '$$']],
+				processEscapes: true,
+				skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+			},
+			messageStyle: "none",
+			"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+		});
+		</script>
+		<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+	</head>
+	<body>
+		<div class="off-canvas-wrap">
+			<div class="inner-wrap">
+				<!-- mobile top bar to activate nav -->
+				<nav class="tab-bar show-for-small">
+					<section class="left-small">
+						<a class="left-off-canvas-toggle menu-icon" ><span></span></a>
+					</section>
+
+					<section class="middle tab-bar-section">
+						<h1 class="title">Brownian&nbsp;Motion</h1>
+					</section>
+				</nav>
+
+				<!-- mobile side bar nav -->
+				<aside class="left-off-canvas-menu">
+					<ul class="off-canvas-list">
+						<li><a href="https://nathanwilliams.github.io">Home</a></li>
+						<li><label>Categories</label></li>
+							<li ><a href="https://nathanwilliams.github.io/category/blog.html">blog</a></li>
+							<li class="active"><a href="https://nathanwilliams.github.io/category/programming.html">programming</a></li>
+
+						<li><label>Links</label></li>
+							<li><a href="https://github.com/NathanWilliams/">GitHUb repo</a></li>
+
+
+						<li><label>Monthly Archives</label></li>
+									<li><a href="/2016/07/index.html">July 2016 (1)</a></li>
+									<li><a href="/2014/02/index.html">February 2014 (1)</a></li>
+									<li><a href="/2013/05/index.html">May 2013 (1)</a></li>
+									<li><a href="/2013/04/index.html">April 2013 (2)</a></li>
+									<li><a href="/2013/02/index.html">February 2013 (3)</a></li>
+
+						<li><label>Social</label></li>
+					</ul>	
+				</aside>
+
+				<!-- top bar nav -->
+				<nav class="top-bar hide-for-small-only" data-topbar>
+					<ul class="title-area">
+						<li class="name">
+							<h1><a href="https://nathanwilliams.github.io/">Brownian Motion</a></h1>
+						</li>
+					</ul>
+
+					<section class="top-bar-section">
+						<ul class="left">
+								<li ><a href="https://nathanwilliams.github.io/category/blog.html">blog</a></li>
+								<li class="active"><a href="https://nathanwilliams.github.io/category/programming.html">programming</a></li>
+						</ul>
+                        <ul class="right">                                                                                                                                           
+                                                                                                                                             
+                        </ul>  
+					</section>
+				</nav>
+
+				<!-- Main Page Content and Sidebar -->
+				<section class="main-section">
+					<div class="row">
+						<!-- Main Content -->
+						<div class="medium-9 small-12 columns" role="content">
+<article>
+	<h2>Minecraft Region files</h2>
+	<p>Finally we start looking at actual Minecraft data files.
+Today the target is the Anvil / Region file which stores all of the chunks that make up a Minecraft world.</p>
+<p>If you are new to this series, have a look at the earlier posts covering <a href="http://nathanwilliams.github.com/2013/02/27/reading-minecraft-nbt-data-in-clojure-with-gloss" title="Reading Minecraft NBT data in Clojure with Gloss">NBT and Gloss</a> to catch up.</p>
+<p>Now, on to the Anvil / Region file format.
+From here on I am going to simply call it "Region" as this was the precursor to Anvil, with the <a href="http://www.minecraftwiki.net/wiki/Region_file_format" title="Region File Format at the Minecraft Wiki">only difference</a> being the NBT structure inside and the file extension.</p>
+<!-- PELICAN_END_SUMMARY -->
+
+<h2>Preparation</h2>
+<p>The code for this blog post is on github, so you can clone the <a href="https://github.com/NathanWilliams/anvil-clj">anvil-clj</a> repo to follow along.</p>
+<p>After cloning it you will want to change in to the project directory, grab dependancies and start a repl:</p>
+<div class="highlight"><pre><span></span>lein deps
+lein repl
+</pre></div>
+
+
+<p>Since the last post I have learnt how to have the repl start in the right namespace, so you should be in the "devel" namespace, ready to go!
+From here you can look at some already decoded data by inspecting "test-header" and "test-chunk".</p>
+<p>We will cover both in more detail throught the post.</p>
+<h2>Region File</h2>
+<p>Minecraft cuts up a world into Regions and Chunks.</p>
+<p>In an earlier version of Minecraft, Chunks were stored directly on disk, one file each.
+This caused problems with the number of open files and the overhead of opening files was bogging the game down. </p>
+<p>Adopted from a mod, Region files were introduced.</p>
+<p>A Region holds 32x32 Chunks, and a Chunk consists of 16x256x16 blocks.
+Region files are named based on the region coordinates such as r.0.0.mca or r.-1.-9.mca</p>
+<p>But as the Minecraft world is generated on demand, not all Chunks will exist in a region.
+To accomodate this without having large empty files, the Region design is almost like a file system of its own.
+Everything is aligned to 4096 bytes, there is a header to find a chunk in the file, and chunks can be moved if they are too large for their sector.</p>
+<p>So now you have a high level overview, lets dig into specifics.</p>
+<h2>The Header</h2>
+<p>A Region file starts with a 8192 byte header which is split into two ZX indexed sections.
+The first is a table of contents, mapping between a ZX coordinate (in Chunk coordinates relative to this file) to a location and size in the file, and the other is a table of timestamps recording when the chunk was last written to disk.</p>
+<p>Each table has 1024 4-byte entires, while the timestamps are simple 32-bit numbers, the locations table is split between offset and length.
+The top 3 bytes (big endian) are an offset in 4KB 'sectors' and the 4th byte is the size in 4KB sectors.</p>
+<h2>Chunk Data</h2>
+<p>Once you have the offset and length, you can seek in the file and find the chunk you want.
+Chunks are stored compressed and can be compressed with either ZLib or GZip, although only ZLib seems to be used by the game right now.</p>
+<p>A chunk has its own small header, 4-bytes indicating the actual length (minus the padding to the next 4096 byte boundry), and a single byte to indicate the compression type, 1 for GZip and 2 for ZLib.</p>
+<p>When you decompress the data you end up with an NBT encoded structure which we will leave for a future post.</p>
+<h2>Code!</h2>
+<p>Now that we know what we want, lets look at how we go about doing it all.</p>
+<p>There are three namespaces in this project:</p>
+<ul>
+<li>devel</li>
+<li>world</li>
+<li>region-file</li>
+</ul>
+<p>The first is a little sandbox to help with repl development.
+It pulls in the other two namespaces, and loads some sample data to save repetition on the repl.</p>
+<p>The world namespace is another convenience tool, which finds the Minecraft worlds saved on your computer and loads binary files (region files) into memory.
+It is not a "complete" tool, it is not smart about loading, everything goes into memory and everything is cached.
+It is however useful.
+While developing the region library, I found myself tweaking a Minecraft creative world (with known blocks at known coordinates), and then copying the world files to the project directory to be reread which was tedious.
+The world library instead allows me to simply name the world, dimension and region X,Z to load the file.</p>
+<p>And finaly, the focus of this post, the functions that make up the region library.
+Here we define the file format in Gloss, find the chunk we want, decompress it and pass it to the nbt library we developed in earlier posts.</p>
+<p>The rest of this post will cover only the region-file namespace, but hopefully the other two will be clear enough to understand and work with.</p>
+<h2>Reading Region files</h2>
+<p>Compared to previous posts, this one is pretty simple.
+We only have to read the file header, and individual chunks inside the file.
+If you have followed this series so far, a lot of it will look familiar.</p>
+<h2>Reading the Header</h2>
+<p>Lets start backwards, from the public interface down to the inner workings.</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">read-header</span> <span class="p">[</span><span class="nv">data</span><span class="p">]</span>
+  <span class="s">&quot;Extract the header record from a region / anvil file.&quot;</span>
+    <span class="p">(</span><span class="nf">gio/decode</span> <span class="nv">file-header</span>
+        <span class="p">(</span><span class="nf">select-bytes</span> <span class="nv">data</span> <span class="mi">0</span> <span class="mi">8192</span><span class="p">)))</span>
+</pre></div>
+
+
+<p>read-header is a simple function, it chops out the first 8192 bytes (the file header), and asks Gloss to decode it using the "file-header" codec.
+Getting the specific bytes is done by select-bytes:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">select-bytes</span> <span class="p">[</span><span class="nv">data</span> <span class="nv">offset</span> <span class="nv">length</span><span class="p">]</span>
+  <span class="s">&quot;Select a range of bytes from a byte buffer&quot;</span>
+<span class="p">(</span><span class="nf">gb/take-bytes</span>
+    <span class="p">(</span><span class="nf">gb/drop-bytes</span> <span class="p">(</span><span class="nf">gb/create-buf-seq</span> <span class="nv">data</span><span class="p">)</span> <span class="nv">offset</span><span class="p">)</span>
+        <span class="nv">length</span><span class="p">))</span>
+</pre></div>
+
+
+<p>Gloss provides a nice set of take and drop like functions for working on buffer sequences (Clojure sequences of Java Buffers).
+So all we need to do is drop the bytes we don't want (0 for the header, but used for chunks), and then take the number of bytes we want from there.
+This might be inefficient, it requires the entire file to be loaded into memory, and is constantly copying buffered data around, but it is simple and works for our needs.
+There is room to improve this if it ever shows to be a problem, but it is better to write code in a clean and easy to understand manner first, and optimise later if it is actually a bottleneck.</p>
+<p>So now we get to the interesting stuff, the file-header codec:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">gc/defcodec</span> <span class="nv">file-header</span>
+  <span class="c1">; 4 byte location  * 1024 entries = 4096 bytes</span>
+  <span class="c1">; 4 byte timestamp * 1024 entries = 4096 bytes</span>
+  <span class="p">(</span><span class="nf">gc/ordered-map</span>
+    <span class="ss">:locations</span>  <span class="p">(</span><span class="nf">gc/finite-frame</span> <span class="mi">4096</span>
+                  <span class="p">(</span><span class="nf">gc/repeated</span> <span class="nv">location-frame</span> <span class="ss">:prefix</span> <span class="ss">:none</span><span class="p">))</span>
+    <span class="ss">:timestamps</span> <span class="p">(</span><span class="nf">gc/finite-frame</span> <span class="mi">4096</span>
+                  <span class="p">(</span><span class="nf">gc/repeated</span> <span class="ss">:int32</span>         <span class="ss">:prefix</span> <span class="ss">:none</span><span class="p">))))</span>
+</pre></div>
+
+
+<p>This is where Gloss really shines, you get to express the layout of the header, instead of having to think about how to actually read it.
+We start with an ordered-map, and split the data into two.
+Each half is defined with a finite-frame, the number of bytes (half the header's 8192), and then a repeated codec to consume those bytes.</p>
+<p>Starting with the easy one, timestamps is simply a 32-bit signed integer.
+So out of 4096 bytes, you get 1024 timestamp entries.
+Nice and simple.</p>
+<p>Locations is a little bit more work, but not much.
+To keep the codec readable, it was broken out into its own "location-frame" codec:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">gc/defcodec-</span> <span class="nv">location-frame</span>
+  <span class="p">(</span><span class="nf">gc/compile-frame</span>   <span class="ss">:int32</span>
+                      <span class="nb">identity </span>         <span class="c1">;writer transform</span>
+                      <span class="nv">decode-location</span><span class="p">))</span> <span class="c1">;reader transform</span>
+</pre></div>
+
+
+<p>A location is also 4 bytes long (the same 1024 entries), but those bytes are split up 3/1.
+To handle this we use Gloss' compile-frame which allows us to post process the returned data with a Clojure function.
+That is where decode-location comes in:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn- </span><span class="nv">decode-location</span> <span class="p">[</span><span class="nv">data</span><span class="p">]</span>
+  <span class="c1">; 4 bytes, split 3/1</span>
+  <span class="c1">; Top 3 bytes are a file offset in 4K sectors</span>
+  <span class="c1">; Bottom byte is the size in 4K sectors</span>
+  <span class="p">{</span> <span class="ss">:offset</span> <span class="p">(</span><span class="nb">* </span><span class="mi">4096</span> <span class="p">(</span><span class="nb">bit-shift-right </span><span class="nv">data</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="ss">:size</span>   <span class="p">(</span><span class="nb">* </span><span class="mi">4096</span> <span class="p">(</span><span class="nb">bit-and </span><span class="nv">data</span> <span class="mi">0</span><span class="nv">xFF</span><span class="p">))})</span>
+</pre></div>
+
+
+<p>The location is made up of a file offset and length.
+Both are in 4096-byte "sectors" and in the file all sectors are padded out to a 4096 byte boundry.
+So all we have to do is shift the data down by a byte (8-bits) to get the top three bytes for the location and for the size we simply mask out the top three bytes using a bitwise and.</p>
+<p>Multiplying both numbers by 4096 gives us the actual byte location and size in the file.</p>
+<p>Before we move on to Chunks, you might have noticed the "identity" writer transform.
+In the future we will be writing data back to region files, and we will need to reverse the above transformation before we write any of it to disk.
+At the moment however we are only reading, so we use identity as a "no-op" function placeholder.</p>
+<h2>Reading Chunks</h2>
+<p>Now that we know where our desired chunk is, and how big it is, we can go and get it!</p>
+<p>Once again we will go from the outside in with the read-chunk function:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">read-chunk</span> <span class="p">[</span><span class="nv">data</span> <span class="nv">offset</span> <span class="nv">size</span><span class="p">]</span>
+  <span class="s">&quot;Read a chunk and decode the NBT data inside&quot;</span>
+  <span class="p">(</span><span class="nb">when-not </span><span class="p">(</span><span class="nb">= </span><span class="mi">0</span> <span class="nv">size</span><span class="p">)</span>
+    <span class="p">(</span><span class="nf">nbt/decode-nbt</span>
+      <span class="p">(</span><span class="nf">gio/decode</span> <span class="nv">chunk-codec</span>
+                  <span class="p">(</span><span class="nf">select-bytes</span> <span class="nv">data</span>
+                                <span class="nv">offset</span>
+                                <span class="nv">size</span><span class="p">)</span>
+                  <span class="nv">false</span><span class="p">))))</span>  <span class="c1">;This tells Gloss to ignore any padding in this &quot;sector&quot;</span>
+</pre></div>
+
+
+<p>While a little bit bigger than read-header, there isn't much here to confuse.
+We start out with a quick safety check that we aren't trying to read an empty chunk, which is helpful if you are mapping read-chunk over an entire file, as not all chunks will exist (unless ofcourse you play a lot of Minecraft!).</p>
+<p>The first big difference is decode-nbt, which takes the resulting decompressed binary data and turns it into a readable nbt data structre using the library we created in an earlier post.</p>
+<p>The other difference is the additional "false" parameter to decode.
+As all chunks are stored in 4096-byte sectors, they are always rounded up and the sector is padded with zero.
+Gloss however throws an exception if you don't consume all data, unless you pass a false to the optional "no-remainder?" parameter.</p>
+<p>Now we get on to the core of reading a chunk, the chunk-codec:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">gc/defcodec</span> <span class="nv">chunk-codec</span>
+  <span class="c1">;The byte layout of a chunk in a region file</span>
+  <span class="p">(</span><span class="nf">gc/finite-frame</span> <span class="ss">:int32</span>
+    <span class="p">(</span><span class="nf">gc/compile-frame</span>
+      <span class="p">(</span><span class="nf">gc/ordered-map</span>
+        <span class="ss">:compression-type</span> <span class="nv">compression-type</span>
+        <span class="ss">:data</span> <span class="p">(</span><span class="nf">gc/repeated</span> <span class="ss">:byte</span> <span class="ss">:prefix</span> <span class="ss">:none</span><span class="p">))</span>
+      <span class="nv">compressor</span>
+      <span class="nv">extractor</span><span class="p">)))</span>
+</pre></div>
+
+
+<p>This is pretty simple, the finite-frame tells Gloss that a 32-bit integer will define the length of the following codec, and limits the data to the codec to that amount.
+The inner codec takes the 1-byte compression type, and then uses repeated to consume what is left in the finite-frame as a sequence of bytes.
+This, like before, is passed to a post-decoder function (extractor) which decompresses the data.</p>
+<p>As we are only reading at the moment, the compressor is just defined as the identity function for now, as we won't be using it.
+So lets look at the extractor and how it works:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">extractor</span> <span class="p">[{</span><span class="ss">:keys</span> <span class="p">[</span><span class="nv">compression-type</span> <span class="nv">data</span><span class="p">]}]</span>
+  <span class="s">&quot;Used as a post-decoder by the chunk codec.</span>
+<span class="s">  Decompresses either GZip or ZLib&quot;</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">byte-stream</span> <span class="p">(</span><span class="nf">ByteArrayInputStream.</span> <span class="p">(</span><span class="nf">byte-array</span> <span class="p">(</span><span class="nb">count </span><span class="nv">data</span><span class="p">)</span> <span class="nv">data</span><span class="p">))</span>
+        <span class="nv">stream</span> <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">= </span><span class="nv">compression-type</span> <span class="ss">:GZip</span><span class="p">)</span>
+                 <span class="p">(</span><span class="nf">GZIPInputStream.</span> <span class="nv">byte-stream</span><span class="p">)</span>
+                 <span class="p">(</span><span class="nf">InflaterInputStream.</span> <span class="nv">byte-stream</span><span class="p">))]</span>
+    <span class="p">(</span><span class="k">loop </span><span class="p">[</span><span class="nv">result</span> <span class="p">[]]</span>
+      <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">buf</span> <span class="p">(</span><span class="nf">byte-array</span> <span class="mi">1024</span><span class="p">)</span> <span class="c1">;We don&#39;t know how big the decompressed data will be, so we read up to 1k at a time</span>
+            <span class="nv">len</span> <span class="p">(</span><span class="nf">.read</span> <span class="nv">stream</span> <span class="nv">buf</span><span class="p">)]</span>
+        <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">&lt; </span><span class="nv">len</span> <span class="mi">0</span><span class="p">)</span>
+          <span class="p">(</span><span class="nf">gio/to-byte-buffer</span> <span class="nv">result</span><span class="p">)</span>
+          <span class="p">(</span><span class="nf">recur</span> <span class="p">(</span><span class="nb">concat </span><span class="nv">result</span> <span class="p">(</span><span class="nb">take </span><span class="nv">len</span> <span class="p">(</span><span class="nb">seq </span><span class="nv">buf</span><span class="p">)))))))))</span>
+</pre></div>
+
+
+<p>As this is bigger than most forms / functions we have covered so far, we will look at it in pieces.</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">extractor</span> <span class="p">[{</span><span class="ss">:keys</span> <span class="p">[</span><span class="nv">compression-type</span> <span class="nv">data</span><span class="p">]}]</span>
+</pre></div>
+
+
+<p>If you haven't seen it before, this is destructuring, and once you understand it, you will love it!
+This function takes a single parameter, a map, and then pulls it apart based on its keys.
+There is a lot more to destructuring than in this example, so go look into it if you haven't seen it before, it can be really help to make your code beautiful. </p>
+<p>If you look back at the chunk-codec, you will notice it had a ":compression-type" and ":data" keywords.
+Destructuring like this gives us the value of those two keys in the map into variables of the same name.</p>
+<div class="highlight"><pre><span></span>  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">byte-stream</span> <span class="p">(</span><span class="nf">ByteArrayInputStream.</span> <span class="p">(</span><span class="nf">byte-array</span> <span class="p">(</span><span class="nb">count </span><span class="nv">data</span><span class="p">)</span> <span class="nv">data</span><span class="p">))</span>
+        <span class="nv">stream</span> <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">= </span><span class="nv">compression-type</span> <span class="ss">:GZip</span><span class="p">)</span>
+                 <span class="p">(</span><span class="nf">GZIPInputStream.</span> <span class="nv">byte-stream</span><span class="p">)</span>
+                 <span class="p">(</span><span class="nf">InflaterInputStream.</span> <span class="nv">byte-stream</span><span class="p">))]</span>
+</pre></div>
+
+
+<p>I looked for a nice Clojure compression library, but failed to find anything.
+However the Java interop isn't actually that bad.</p>
+<p>We turn the data into a new byte-array, and wrap it in a ByteArrayInputStream, from here we check the compression type and wrap it in the appropriate decompressor.</p>
+<div class="highlight"><pre><span></span>    <span class="p">(</span><span class="k">loop </span><span class="p">[</span><span class="nv">result</span> <span class="p">[]]</span>
+      <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">buf</span> <span class="p">(</span><span class="nf">byte-array</span> <span class="mi">1024</span><span class="p">)</span> <span class="c1">;We don&#39;t know how big the decompressed data will be, so we read up to 1k at a time</span>
+            <span class="nv">len</span> <span class="p">(</span><span class="nf">.read</span> <span class="nv">stream</span> <span class="nv">buf</span><span class="p">)]</span>
+        <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">&lt; </span><span class="nv">len</span> <span class="mi">0</span><span class="p">)</span>
+          <span class="p">(</span><span class="nf">gio/to-byte-buffer</span> <span class="nv">result</span><span class="p">)</span>
+          <span class="p">(</span><span class="nf">recur</span> <span class="p">(</span><span class="nb">concat </span><span class="nv">result</span> <span class="p">(</span><span class="nb">take </span><span class="nv">len</span> <span class="p">(</span><span class="nb">seq </span><span class="nv">buf</span><span class="p">)))))))))</span>
+</pre></div>
+
+
+<p>The heart of it all, we read out the data at 1k chunks at a time, concat it all together and return a Gloss byte-buffer.
+The 1k value is arbitrary, and other values might give better performance.</p>
+<p>We start with a loop.
+If you are coming from an imperitive background, you need to forget what you know about loops.
+In an imperitive language, when you get to the bottom of the loop, control jumps back to the top like a goto.
+In Clojure the "loop" is a recursion target.
+Now if you call "recur" inside of it, instead of recursively calling the function, it recursevley calls the loop (with tail call optimisation, so you don't consume more stack).</p>
+<p>Now, in reality, and likely under the covers, this is very much the same as an imperitive loop, but like most things, it is how you think about it that matters.</p>
+<p>So we start the loop with an empty list "result".
+We make a 1k byte-array and read from the stream into it, here we are relying on the internal state of the stream, but it is a small infraction against purity for the concise code that comes out.</p>
+<p>Reading from a stream returns the number of bytes read, or -1 if you are at the end of the stream.</p>
+<p>So finally we have the "if" condition.
+When we hit the end of the stream, we return the "result", converted to a Gloss byte-buffer.
+If we have data remaining however, we recursively call the loop, passing in the current "result" concatenated with the bytes we just read (trimmed of course, as a stream can, and will, return a varying number of bytes from 1 to the size of your buffer).</p>
+<p>The only thing left that we haven't covered is the compression-type codec used in the chunk codec.</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">gc/defcodec</span> <span class="nv">compression-type</span>
+  <span class="c1">;The file format and minecraft support both</span>
+  <span class="c1">;But so far only ZLib is actually used</span>
+  <span class="p">(</span><span class="nf">gc/enum</span> <span class="ss">:byte</span> <span class="p">{</span><span class="ss">:GZip</span> <span class="mi">1</span>
+                  <span class="ss">:ZLib</span> <span class="mi">2</span><span class="p">}))</span>
+</pre></div>
+
+
+<p>This is pretty simple and if you have read the earlier posts you should recognise it and how it works.</p>
+<h2>Conclusion</h2>
+<p>Reading a Region file is actually pretty easy.
+So easy in fact that when I first attempted it I got carried away and started to decode the chunk NBT structure inside, mapping block IDs, biomes and more to their human readable names!</p>
+<p>As always, if you see a mistake in any of the above, from grammer and spelling to coding, clone the Git repo for the blog, make the change and send me a pull request.
+If you have suggestions or questions, raise an issue and I will get back to you.</p>
+<h2>Next Time</h2>
+<p>I have something a bit more interesting in mind for next time to change things up a bit.
+While I am having fun decoding these files, after a while it starts to become endless walls of text in the form of Clojure data structures.
+I would like to do something a bit more visual next time, lets see how long it takes me to actually get there!</p>
+	<hr/>
+	<h6>Written by <a href="https://nathanwilliams.github.io/author/nathan-williams.html">Nathan Williams</a> in <a href="https://nathanwilliams.github.io/category/programming.html">programming</a> on Tue 16 April 2013. Tags: <a href="https://nathanwilliams.github.io/tag/clojure.html">Clojure</a>, <a href="https://nathanwilliams.github.io/tag/minecraft.html">Minecraft</a>, <a href="https://nathanwilliams.github.io/tag/region.html">Region</a>, <a href="https://nathanwilliams.github.io/tag/anvil.html">Anvil</a>, </h6>
+</article>
+
+<hr/>
+						</div>
+						<!-- End Main Content -->
+						<!-- Sidebar -->
+						<aside class="medium-3 hide-for-small-only columns">
+							<div class="panel">
+								<h5>Links</h5>
+								<ul class="side-nav">
+									<li><a href="https://github.com/NathanWilliams/">GitHUb repo</a></li>
+								</ul>
+							</div>
+
+							<div class="panel">
+								<h5>Tags</h5>
+								<ul class="tag-cloud">
+								</ul>
+							</div>
+
+							<div class="panel">
+								<h5>Monthly Archives</h5>
+								<ul class="side-nav">
+											<li><a href="/2016/07/index.html">July 2016 (1)</a></li>
+											<li><a href="/2014/02/index.html">February 2014 (1)</a></li>
+											<li><a href="/2013/05/index.html">May 2013 (1)</a></li>
+											<li><a href="/2013/04/index.html">April 2013 (2)</a></li>
+											<li><a href="/2013/02/index.html">February 2013 (3)</a></li>
+								</ul>
+							</div>
+
+							<div class="panel">
+								<h5>Social</h5>
+								<ul class="side-nav">
+								</ul>
+							</div>
+						</aside>
+						<!-- End Sidebar -->
+					</div>
+
+					<!-- Footer -->
+					<footer class="row">
+						<div class="medium-9 small-12">
+							<hr/>
+							<p class="text-center">Powered by <a href="http://getpelican.com">Pelican</a> and <a href="http://foundation.zurb.com/">Zurb Foundation</a>. Theme by <a href="http://hamaluik.com">Kenton Hamaluik</a>.</p>
+						</div>
+					</footer>
+					<!-- End Footer -->
+				</section>
+				<a class="exit-off-canvas"></a>
+			</div><!--off-canvas inner-->
+		</div><!--off-canvas wrap-->
+
+		<script src="https://nathanwilliams.github.io/theme/js/jquery.js"></script>
+		<script src="https://nathanwilliams.github.io/theme/js/foundation.min.js"></script>
+		<script>
+			$(document).foundation();
+		</script>
+	</body>
+</html>

@@ -1,0 +1,509 @@
+<!doctype html>
+<html class="no-js" lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<title>Brownian Motion</title>
+		<meta name="description" content="">
+		<meta name="author" content="Nathan Williams">
+
+		<link rel="stylesheet" href="https://nathanwilliams.github.io/theme/css/foundation.css" />
+		<link rel="stylesheet" href="https://nathanwilliams.github.io/theme/css/pygment/monokai.css" />
+		<link rel="stylesheet" href="https://nathanwilliams.github.io/theme/css/custom.css" />
+
+
+		<script src="https://nathanwilliams.github.io/theme/js/modernizr.js"></script>
+
+		<!-- Feeds -->
+
+<script>var _gaq=[['_setAccount','UA-38967315-1'],['_trackPageview']];(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.src='//www.google-analytics.com/ga.js';s.parentNode.insertBefore(g,s)}(document,'script'))</script>
+
+		<!-- mathjax config similar to math.stackexchange -->
+		<script type="text/x-mathjax-config">
+		MathJax.Hub.Config({
+			jax: ["input/TeX", "output/HTML-CSS"],
+			tex2jax: {
+				inlineMath: [ ['$', '$'] ],
+				displayMath: [ ['$$', '$$']],
+				processEscapes: true,
+				skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+			},
+			messageStyle: "none",
+			"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+		});
+		</script>
+		<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+	</head>
+	<body>
+		<div class="off-canvas-wrap">
+			<div class="inner-wrap">
+				<!-- mobile top bar to activate nav -->
+				<nav class="tab-bar show-for-small">
+					<section class="left-small">
+						<a class="left-off-canvas-toggle menu-icon" ><span></span></a>
+					</section>
+
+					<section class="middle tab-bar-section">
+						<h1 class="title">Brownian&nbsp;Motion</h1>
+					</section>
+				</nav>
+
+				<!-- mobile side bar nav -->
+				<aside class="left-off-canvas-menu">
+					<ul class="off-canvas-list">
+						<li><a href="https://nathanwilliams.github.io">Home</a></li>
+						<li><label>Categories</label></li>
+							<li ><a href="https://nathanwilliams.github.io/category/blog.html">blog</a></li>
+							<li class="active"><a href="https://nathanwilliams.github.io/category/programming.html">programming</a></li>
+
+						<li><label>Links</label></li>
+							<li><a href="https://github.com/NathanWilliams/">GitHUb repo</a></li>
+
+
+						<li><label>Monthly Archives</label></li>
+									<li><a href="/2016/07/index.html">July 2016 (1)</a></li>
+									<li><a href="/2014/02/index.html">February 2014 (1)</a></li>
+									<li><a href="/2013/05/index.html">May 2013 (1)</a></li>
+									<li><a href="/2013/04/index.html">April 2013 (2)</a></li>
+									<li><a href="/2013/02/index.html">February 2013 (3)</a></li>
+
+						<li><label>Social</label></li>
+					</ul>	
+				</aside>
+
+				<!-- top bar nav -->
+				<nav class="top-bar hide-for-small-only" data-topbar>
+					<ul class="title-area">
+						<li class="name">
+							<h1><a href="https://nathanwilliams.github.io/">Brownian Motion</a></h1>
+						</li>
+					</ul>
+
+					<section class="top-bar-section">
+						<ul class="left">
+								<li ><a href="https://nathanwilliams.github.io/category/blog.html">blog</a></li>
+								<li class="active"><a href="https://nathanwilliams.github.io/category/programming.html">programming</a></li>
+						</ul>
+                        <ul class="right">                                                                                                                                           
+                                                                                                                                             
+                        </ul>  
+					</section>
+				</nav>
+
+				<!-- Main Page Content and Sidebar -->
+				<section class="main-section">
+					<div class="row">
+						<!-- Main Content -->
+						<div class="medium-9 small-12 columns" role="content">
+<article>
+	<h2>Seesaw, GUI programming the Clojure way</h2>
+	<p>In this post we are going to look at how to make a GUI in Clojure without the ugliness that is Swing.
+Seesaw is a Clojure library that wraps Swing making it easier to work with and with much less code.</p>
+<p>Keeping with the Minecraft theme, we will be expanding on the previous posts and visualising a Minecraft Anvil / Region file.</p>
+<p>If you are new to this series, jump back and have a look at the previous post to catch up: <a href="http://nathanwilliams.github.io/2013/04/16/minecraft-region-files/">Minecraft Region Files</a></p>
+<!-- PELICAN_END_SUMMARY -->
+
+<h1>Preparation</h1>
+<p>As always, the code to go along with this post can be found on GitHub, so clone the <a href="https://github.com/NathanWilliams/anvil-view">anvil-view</a> repo and launch a repl:</p>
+<div class="highlight"><pre><span></span>lein deps
+lein repl
+</pre></div>
+
+
+<h1>The GUI</h1>
+<p>With the REPL up, type the following to bring up the finished product:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">show-gui</span><span class="p">)</span>
+</pre></div>
+
+
+<p>You should get the following window:</p>
+<p><img alt="Anvil View" src="https://nathanwilliams.github.io/images/anvilview.png"></p>
+<p>So by now you may have realised that GUI layout is not my strong point!
+The interface is ugly, but functional.</p>
+<p>At the top you have three menus, the first lists the Minecraft worlds you have on your computer (looking in the standard Minecraft directory), the second is the dimension and the last is the Anvil file.</p>
+<p>Below the screen is divided into four quadrants.
+The top left is a representation of the header file, with white blocks being empty, and green being used.</p>
+<p>As you move the mouse over this view, the quadrant at the top right displays information for that record, and the quadrant at the bottom left highlights the data referenced by that header block.</p>
+<p>The bottom left is the layout of chunk data in the file, with the first two sectors taken by the header (each sector being 4096 bytes, and the header being 2 sectors).</p>
+<p>The bottom right was meant to be a display of NBT data, and it was almost working in a tree, but is currently disabled so this post could at least be made!</p>
+<h1>The Code</h1>
+<p>The code has been divided into a Model-View-Controller pattern, with an attempt at keeping different concepts isolated.</p>
+<p>As this post is focusing on GUI programming, it will be limited to covering the view.clj and controller.clj files.
+Hopefully the rest should be reasonably easy to follow based on previous posts.</p>
+<p>To start out, lets talk about Seesaw and Swing.</p>
+<h1>Seesaw &amp; Swing</h1>
+<p>If you have ever created a GUI in Java before, you will have come across Swing.
+Swing is the main Java API for creating GUIs, and it is a bit of a beast to learn and work with.</p>
+<p>Seesaw is a Clojure library that wraps Swing and tries to make life more plesent, to make things clearer, and to do some of the heavy lifting for you.</p>
+<p>Seesaw can be found here: <a href="https://github.com/daveray/seesaw">Seesaw</a></p>
+<h1>Frames &amp; Panels</h1>
+<p>To create a GUI in Swing, you need a <em>frame</em> (a window) and you divide it up by using <em>panels</em>.</p>
+<p>Panels come in many forms and help control your layout when the size of your window changes, helping your widgets and layout stretch proportionally to each other.</p>
+<p>Open up view.clj, and look for "main-window":</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="k">def </span><span class="nv">main-window</span>
+  <span class="p">(</span><span class="nf">sc/frame</span> <span class="ss">:title</span> <span class="nv">title</span>
+            <span class="ss">:width</span> <span class="p">(</span><span class="ss">:width</span> <span class="nv">window-size</span><span class="p">)</span>
+            <span class="ss">:height</span> <span class="p">(</span><span class="ss">:height</span> <span class="nv">window-size</span><span class="p">)</span>
+            <span class="ss">:content</span> <span class="nv">window-content</span><span class="p">))</span>
+</pre></div>
+
+
+<p>This is how we define the window you saw earlier.
+"sc" is the name I gave seesaw.core when I required it.
+sc/frame creates a JFrame with its options being passed in as pairs of keys and values.</p>
+<p>Not all values are required, anything not specified reverts to default values.
+The options above are self explanatory, but how do you know what options are available?</p>
+<p>This is one of the shining points of seesaw, it has great development support in the REPL.</p>
+<p>In the REPL you launched earlier, type the following:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">use</span> <span class="ss">&#39;seesaw.dev</span><span class="p">)</span>
+<span class="p">(</span><span class="nf">use</span> <span class="ss">&#39;seesaw.core</span><span class="p">)</span>
+
+<span class="p">(</span><span class="nf">show-options</span> <span class="p">(</span><span class="nf">frame</span><span class="p">))</span>
+</pre></div>
+
+
+<p>You will get back something like the following:</p>
+<div class="highlight"><pre><span></span><span class="nv">seesaw.core.proxy$javax.swing.JFrame$Tag$a79ba523</span>
+                    <span class="nv">Option</span>  <span class="nv">Notes/Examples</span>
+<span class="nv">--------------------------</span>  <span class="nv">--------------</span>
+                    <span class="ss">:class</span>  <span class="nv">A</span> <span class="nb">keyword </span><span class="nv">class</span>, <span class="nv">in</span> <span class="nv">the</span> <span class="nv">HTML/CSS</span> <span class="nv">sense.</span>
+                            <span class="nv">See</span> <span class="p">(</span><span class="nf">Seesaw.core/select</span><span class="p">)</span>
+                  <span class="ss">:content</span>  <span class="nv">The</span> <span class="nv">frame</span><span class="ss">&#39;s</span> <span class="nv">main</span> <span class="nv">content</span> <span class="nv">widget</span>
+                     <span class="ss">:icon</span>
+                       <span class="ss">:id</span>  <span class="nv">A</span> <span class="nb">keyword </span><span class="nv">id.</span>
+                            <span class="nv">See</span> <span class="p">(</span><span class="nf">seesaw.core/select</span><span class="p">)</span>
+                  <span class="ss">:menubar</span>  <span class="nv">The</span> <span class="nv">frame</span><span class="ss">&#39;s</span> <span class="nv">menu</span> <span class="nv">bar.</span> <span class="nv">See</span> <span class="p">(</span><span class="nf">seesaw.core/menubar</span><span class="p">)</span><span class="nv">.</span>
+             <span class="ss">:minimum-size</span>  <span class="p">[</span><span class="mi">640</span> <span class="ss">:by</span> <span class="mi">480</span><span class="p">]</span>
+                            <span class="nv">java.awt.Dimension</span>
+                 <span class="ss">:on-close</span>  <span class="ss">:hide</span>
+                            <span class="ss">:dispose</span>
+                            <span class="ss">:exit</span>
+                            <span class="ss">:nothing</span>
+               <span class="ss">:resizable?</span>
+                 <span class="ss">:resource</span>  <span class="nv">A</span> <span class="nv">i18n</span> <span class="nv">prefix</span> <span class="nb">for </span><span class="nv">a</span> <span class="nv">resource</span> <span class="nv">with</span> <span class="nv">keys</span>
+                            <span class="p">[</span><span class="ss">:title</span> <span class="ss">:icon</span><span class="p">]</span>
+                     <span class="ss">:size</span>
+                    <span class="ss">:title</span>  <span class="nv">The</span> <span class="nv">frame</span><span class="ss">&#39;s</span> <span class="nv">title</span> <span class="nv">as</span> <span class="nv">string</span> <span class="nb">or </span><span class="nv">resource</span> <span class="nv">key</span>
+         <span class="ss">:transfer-handler</span>  <span class="nv">See</span> <span class="p">(</span><span class="nf">seesaw.dnd/to-transfer-handler</span><span class="p">)</span>
+             <span class="ss">:undecorated?</span>
+                 <span class="ss">:visible?</span>
+</pre></div>
+
+
+<p>This handy tool can be used to on any of the Seesaw elements, and is really helpful for exploring what is possible.</p>
+<p>If you have read through the options above, you may have noticed the <em>class</em> and <em>id</em> options.
+We will cover this more later, but in brief, if you have ever worked with CSS selectors, you will find these options very useful.</p>
+<p>Before we move on, we should quickly have a look at what the contents of our <em>main-window</em> are:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="k">def </span><span class="nv">window-content</span>
+  <span class="p">(</span><span class="nf">sc/border-panel</span>
+     <span class="ss">:north</span>  <span class="nv">world-selector</span>
+     <span class="ss">:center</span> <span class="p">(</span><span class="nf">sc/vertical-panel</span>
+                <span class="ss">:items</span> <span class="p">[</span><span class="nv">header-panel</span> <span class="nv">sector-panel</span><span class="p">])))</span>
+</pre></div>
+
+
+<p>This is the first panel we use, and it contains all other panels.
+A border-panel is a "BorderLayout" in Java terms, and breaks up into five sections, the points of the compass and a centre.</p>
+<p>In this case we are only using the north (for the world selection menus) and the centre (or 'center' for our American friends!) for the rest of the GUI.</p>
+<p>If you follow the definition of each, you will find more panels dividing up those subsections in different ways.
+It is almost like a set of Russian dolls, with panels inside of panels!</p>
+<h1>User Input</h1>
+<p>An interface isn't much fun if you can't interact with it, so lets look at the two ways you can interact with this interface.</p>
+<p>First we have the menus to select the anvil file to load, and then we have the mouse-over effect when you hover over the header to see the sector(s) it references.</p>
+<h2>Comboboxes</h2>
+<p>The world / dimension / file selector is implemented as a set of combobox widgets.</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="k">def </span><span class="nv">world-selector</span>
+  <span class="s">&quot;Used to select the world, dimension and anvil file to view&quot;</span>
+  <span class="p">(</span><span class="nf">sc/horizontal-panel</span>
+     <span class="ss">:items</span> <span class="p">[(</span><span class="nf">sc/combobox</span> <span class="ss">:model</span> <span class="nv">worldlist</span>               <span class="ss">:id</span> <span class="ss">:worldlist</span><span class="p">)</span>
+             <span class="p">(</span><span class="nf">sc/combobox</span> <span class="ss">:model</span> <span class="nv">worlds/dimension-names</span>  <span class="ss">:id</span> <span class="ss">:dimension</span><span class="p">)</span>
+             <span class="p">(</span><span class="nf">sc/combobox</span> <span class="ss">:model</span> <span class="nv">files</span>                   <span class="ss">:id</span> <span class="ss">:files</span><span class="p">)]))</span>
+</pre></div>
+
+
+<p>Here we simply create them directly in the panel that holds them, supplying a data model and an id to reference them by later.</p>
+<p>The id is used just like an id in a HTML document and can be selected just like you would with a CSS selector.</p>
+<p>The model is just some form of data structure to fill the combobox with.
+When you select a world, or a dimension, the list of files to pick from will change, so we will need to be able to change the model when that happens.</p>
+<p>When a change is detected, we can update the file list with the following:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">update-files</span> <span class="p">[]</span>
+  <span class="p">(</span><span class="nf">sc/config!</span> <span class="p">(</span><span class="nf">sc/select</span> <span class="nv">main-window</span> <span class="p">[</span><span class="ss">:#files</span><span class="p">])</span>
+              <span class="ss">:model</span> <span class="p">(</span><span class="nf">worlds/get-files</span> <span class="p">(</span><span class="nf">get-world</span><span class="p">)</span> <span class="p">(</span><span class="nf">get-dimension</span><span class="p">))))</span>
+</pre></div>
+
+
+<p>This is where we make use of the id we created earlier, and we update the config of the element, switching out its current model with a new one.</p>
+<p><em>select</em> is Seesaw's way of getting an object without you having to hold a reference somewhere.
+It takes the parent frame, and a CSS like selector.</p>
+<p><em>config!</em> takes the element returned from the select, and gives it a new model value returned by the "get-files" function.</p>
+<p>Now that we have created the comboboxes, we need a way to know when they have changed and a way to get their value.</p>
+<h2>Listeners</h2>
+<p>To be notified of when an event happens on a widget, you need to register a listener.
+Seesaw makes this really simply with the <em>listen</em> function.</p>
+<p>Open controller.clj and have a look at setup-listeners</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">setup-listeners</span> <span class="p">[]</span>
+  <span class="p">(</span><span class="nf">sc/listen</span> <span class="p">(</span><span class="nf">sc/select</span> <span class="nv">view/main-window</span> <span class="p">[</span><span class="ss">:#worldlist</span><span class="p">])</span>
+             <span class="ss">:selection</span> <span class="nv">world-changed</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">sc/listen</span> <span class="p">(</span><span class="nf">sc/select</span> <span class="nv">view/main-window</span> <span class="p">[</span><span class="ss">:#dimension</span><span class="p">])</span>
+             <span class="ss">:selection</span> <span class="nv">dimension-changed</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">sc/listen</span> <span class="p">(</span><span class="nf">sc/select</span> <span class="nv">view/main-window</span> <span class="p">[</span><span class="ss">:#files</span><span class="p">])</span>
+             <span class="ss">:selection</span> <span class="nv">file-changed</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">sc/listen</span> <span class="nv">view/header-canvas</span>
+             <span class="ss">:mouse-moved</span> <span class="nv">header-mouse-moved</span><span class="p">))</span>
+</pre></div>
+
+
+<p>Al you need to do is pass in an object (which we get using select in this case) and pairs of events and functions to handle that event.</p>
+<p>As before, if you want to know what type of events are available for a given element, the Seesaw dev tools make it really simple:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">use</span> <span class="ss">&#39;seesaw.dev</span><span class="p">)</span>
+<span class="p">(</span><span class="nf">show-events</span> <span class="p">(</span><span class="nf">combobox</span><span class="p">))</span>
+</pre></div>
+
+
+<p>This gives the following list:</p>
+<div class="highlight"><pre><span></span><span class="ss">:action</span> <span class="p">[</span><span class="nv">java.awt.event.ActionListener</span><span class="p">]</span>
+  <span class="ss">:action-performed</span>
+<span class="ss">:component</span> <span class="p">[</span><span class="nv">java.awt.event.ComponentListener</span><span class="p">]</span>
+  <span class="ss">:component-hidden</span>
+  <span class="ss">:component-moved</span>
+  <span class="ss">:component-resized</span>
+  <span class="ss">:component-shown</span>
+<span class="ss">:focus</span> <span class="p">[</span><span class="nv">java.awt.event.FocusListener</span><span class="p">]</span>
+  <span class="ss">:focus-gained</span>
+  <span class="ss">:focus-lost</span>
+<span class="ss">:item</span> <span class="p">[</span><span class="nv">java.awt.event.ItemListener</span><span class="p">]</span>
+  <span class="ss">:item-state-changed</span>
+<span class="ss">:key</span> <span class="p">[</span><span class="nv">java.awt.event.KeyListener</span><span class="p">]</span>
+  <span class="ss">:key-pressed</span>
+  <span class="ss">:key-released</span>
+  <span class="ss">:key-typed</span>
+<span class="ss">:mouse</span> <span class="p">[</span><span class="nv">java.awt.event.MouseListener</span><span class="p">]</span>
+  <span class="ss">:mouse-clicked</span>
+  <span class="ss">:mouse-entered</span>
+  <span class="ss">:mouse-exited</span>
+  <span class="ss">:mouse-pressed</span>
+  <span class="ss">:mouse-released</span>
+<span class="ss">:mouse-motion</span> <span class="p">[</span><span class="nv">java.awt.event.MouseMotionListener</span><span class="p">]</span>
+  <span class="ss">:mouse-dragged</span>
+  <span class="ss">:mouse-moved</span>
+<span class="ss">:mouse-wheel</span> <span class="p">[</span><span class="nv">java.awt.event.MouseWheelListener</span><span class="p">]</span>
+  <span class="ss">:mouse-wheel-moved</span>
+<span class="ss">:property-change</span> <span class="p">[</span><span class="nv">java.beans.PropertyChangeListener</span><span class="p">]</span>
+  <span class="ss">:property-change</span>
+<span class="ss">:selection</span> <span class="p">[</span><span class="nv">java.awt.event.ActionListener</span><span class="p">]</span>
+  <span class="ss">:action-performed</span>
+</pre></div>
+
+
+<p>The beauty of this system is that you don't need to make a class that conforms to a certain listener interface just to provide a simple callback method.
+All you need is a Clojure function, and Seesaw does the rest.</p>
+<p>Although we don't make use of it here, <em>listen</em> returns a function that when called removes the listener created by the call.</p>
+<h2>Getting the value</h2>
+<p>Now that you can trigger a callback on a change, all you need now is a way to get the value.</p>
+<p>Here Seesaw provides a simple function that works across all of the various widgets, simply called <em>value</em>.</p>
+<p>Here is how we get the selected file:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">get-file</span> <span class="p">[]</span>
+  <span class="p">(</span><span class="nf">sc/value</span> <span class="p">(</span><span class="nf">sc/select</span> <span class="nv">main-window</span> <span class="p">[</span><span class="ss">:#files</span><span class="p">])))</span>
+</pre></div>
+
+
+<p>So clean and simple, Seesaw really does make it nicer to code a GUI!</p>
+<h1>Output</h1>
+<p>All that is left now, is to show the user something in response to their actions.
+In this application we have two forms of output.
+One is drawing to the two canvases, and the other is textual information in a table.</p>
+<p>There were plans for a tree to display the NBT data, but that has been problematic and I didn't want to hold this post up for that one piece.</p>
+<h2>The Canvas</h2>
+<p>Drawing in the canvas consists of drawing a list of primitives such as rectangles, circles, polygons etc.</p>
+<p>Creating a canvas element in Seesaw is once again a very simple process:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="k">def </span><span class="nv">header-canvas</span>
+  <span class="p">(</span><span class="nf">sc/canvas</span> <span class="ss">:id</span>         <span class="ss">:headercanvas</span>
+             <span class="ss">:background</span> <span class="ss">:white</span><span class="p">))</span>
+
+<span class="p">(</span><span class="k">def </span><span class="nv">sector-canvas</span>
+  <span class="p">(</span><span class="nf">sc/canvas</span> <span class="ss">:id</span>         <span class="ss">:sectorcanvas</span>
+             <span class="ss">:background</span> <span class="ss">:white</span><span class="p">))</span>
+</pre></div>
+
+
+<p>This should look familiar, and is one of the real strengths in Seesaw where the various elements all share the same creation interface.</p>
+<p>As id has been given to both canvases, but as we store them in a var, this isn't really needed.
+All we are defining right now is the background colour.</p>
+<p>There isn't much more to say about them, they are really this simple!
+They do however offer many more options, so don't forget to call show-options in a repl to see what is available.</p>
+<p>Now that we have a canvas, we can start drawing into them.</p>
+<p>Before we can however, we need to define a paint function.
+This could have been added at creation, but to keep the code a bit clearer, I decided to delay it to a later point in the code.</p>
+<p>Changing a setting on an element is simple though, just like we did with the comboboxes, we just need to call config!:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">init-view</span> <span class="p">[]</span>
+  <span class="c1">; Config the paint functions etc</span>
+  <span class="p">(</span><span class="nf">sc/config!</span> <span class="nv">header-canvas</span> <span class="ss">:paint</span> <span class="nv">paint-header</span><span class="p">)</span>
+  <span class="p">(</span><span class="nf">sc/config!</span> <span class="nv">sector-canvas</span> <span class="ss">:paint</span> <span class="nv">paint-body</span><span class="p">))</span>
+</pre></div>
+
+
+<p>Starting with the header's paint function:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">paint-header</span> <span class="p">[</span><span class="nv">context</span> <span class="nv">graphics</span><span class="p">]</span>
+  <span class="p">(</span><span class="nb">apply </span><span class="nv">sg/draw</span> <span class="nv">graphics</span>
+    <span class="p">(</span><span class="nb">apply concat </span><span class="p">(</span><span class="nf">render-header</span><span class="p">))))</span>
+</pre></div>
+
+
+<p>It might be a bit hard to understand this without knowing what render-header is returning, so lets try a simpler example quickly:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">paint</span> <span class="p">[</span><span class="nv">c</span> <span class="nv">g</span><span class="p">]</span>
+   <span class="p">(</span><span class="nf">draw</span> <span class="nv">g</span> <span class="p">(</span><span class="nf">rect</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">10</span> <span class="mi">10</span><span class="p">)</span>
+           <span class="p">(</span><span class="nf">style</span> <span class="ss">:foreground</span> <span class="p">(</span><span class="nf">scolor/color</span> <span class="ss">:black</span><span class="p">))))</span>
+</pre></div>
+
+
+<p>This example would simply draw a 10x10 rectangle at 0,0 (top left of its parent) and would use draw it in black.</p>
+<p>All <em>draw</em> takes is a sequence of primitives and the style to apply to them.
+Now if you read paint-header, you should be able to guess that render-header returns a sequence of primitives and styles, we simply concat it all into a sinle sequence, and then use apply to pass the contents of that sequence to draw as arguments.</p>
+<p>The rest of the drawing routine is simply a way to create that sequence of primitives (rectangles) and their style (green if used, white / empty if not):</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">render-record</span> <span class="p">[</span><span class="nv">row</span> <span class="nv">col</span> <span class="nv">rec</span><span class="p">]</span>
+  <span class="p">[(</span><span class="nf">sg/rect</span> <span class="p">(</span><span class="nb">* </span><span class="mi">10</span> <span class="nv">col</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="mi">10</span> <span class="nv">row</span><span class="p">)</span> <span class="mi">8</span> <span class="mi">8</span><span class="p">)</span>
+   <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nf">chunk-model/empty-chunk?</span> <span class="nv">rec</span><span class="p">)</span>
+     <span class="nv">empty-style</span>
+     <span class="nv">used-style</span><span class="p">)])</span>
+
+<span class="p">(</span><span class="kd">defn </span><span class="nv">render-header</span> <span class="p">[]</span>
+  <span class="p">(</span><span class="nb">apply </span><span class="nv">concat</span>
+    <span class="p">(</span><span class="nf">map-indexed</span>
+     <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">z-index</span> <span class="nv">rowdata</span><span class="p">]</span> <span class="p">(</span><span class="nf">map-indexed</span> <span class="p">(</span><span class="nb">partial </span><span class="nv">render-record</span> <span class="nv">z-index</span><span class="p">)</span> <span class="nv">rowdata</span><span class="p">))</span>
+         <span class="p">(</span><span class="nf">selected-header</span><span class="p">))))</span>
+</pre></div>
+
+
+<p>I'm not going to go down every path here as it relies on the data models that aren't going to be examined today.
+But put simply, render-header gets the value of each header record, and uses render-record to draw the appropriate rectangle.</p>
+<p>render-record is the more interesting function.
+It returns a vector of two elements, the rectangle whose position is determined by the row and column of the data, and the style is selected based on if the header is refering to data with any size (an empty-chunk is defined as one having zero size).</p>
+<p>Painting the sectors is very similar, but with the addition of the highlighted sectors when you move the mouse over the header.</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="k">def </span><span class="nv">sectors-per-row</span> <span class="mi">40</span><span class="p">)</span>
+
+<span class="p">(</span><span class="kd">defn </span><span class="nv">render-sector</span> <span class="p">[</span><span class="nv">i</span> <span class="nv">s</span><span class="p">]</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">x</span> <span class="p">(</span><span class="nb">rem </span><span class="nv">i</span> <span class="nv">sectors-per-row</span><span class="p">)</span>
+        <span class="nv">y</span> <span class="p">(</span><span class="nb">quot </span><span class="nv">i</span> <span class="nv">sectors-per-row</span><span class="p">)]</span>
+    <span class="p">[(</span><span class="nf">sg/rect</span> <span class="p">(</span><span class="nb">* </span><span class="mi">10</span> <span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="mi">10</span> <span class="nv">y</span><span class="p">)</span> <span class="mi">8</span> <span class="mi">8</span><span class="p">)</span>
+     <span class="p">(</span><span class="nb">cond </span><span class="p">(</span><span class="nb">contains? </span><span class="o">@</span><span class="nv">highlight-sectors</span> <span class="nv">i</span><span class="p">)</span> <span class="nv">highlight-style</span>
+           <span class="nv">s</span>                                <span class="nv">used-style</span>
+           <span class="ss">:default</span>                         <span class="nv">empty-style</span><span class="p">)]))</span>
+
+<span class="p">(</span><span class="kd">defn </span><span class="nv">render-sectors</span> <span class="p">[]</span>
+  <span class="p">(</span><span class="nb">apply </span><span class="nv">concat</span>
+    <span class="p">(</span><span class="nf">map-indexed</span> <span class="nv">render-sector</span>
+       <span class="p">(</span><span class="nf">file-model/ordered-sectors</span> <span class="p">(</span><span class="nf">selected-header</span><span class="p">)))))</span>
+
+<span class="p">(</span><span class="kd">defn </span><span class="nv">paint-body</span> <span class="p">[</span><span class="nv">context</span> <span class="nv">graphics</span><span class="p">]</span>
+  <span class="p">(</span><span class="nb">apply </span><span class="nv">sg/draw</span> <span class="nv">graphics</span> <span class="p">(</span><span class="nf">render-sectors</span><span class="p">)))</span>
+</pre></div>
+
+
+<p>If the sector being drawn is in the <em>highlight-sectors</em> atom, then it is given an orange style, if the sector is not empty (<em>s</em> is true) it is given a green style and otherwise it is given a white / empty style.</p>
+<p>The positioning of the rectangles is a bit of a lazy hack, using a magic value <em>sectors-per-row</em> but it kept things simple for now.</p>
+<h2>Tables</h2>
+<p>The last bit of information we have to display are things like the timestamp of the latest update for the highlighted chunk.
+For this a table is used, and once again, Seesaw makes life easy.</p>
+<p>Creating the table is pretty much self explanatory by now:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="k">def </span><span class="nv">header-info</span>
+  <span class="p">(</span><span class="nf">sc/table</span>
+   <span class="ss">:model</span> <span class="p">[</span><span class="ss">:columns</span> <span class="p">[{</span><span class="ss">:key</span> <span class="ss">:var</span>   <span class="ss">:text</span> <span class="s">&quot;Variable&quot;</span><span class="p">}</span>
+                     <span class="p">{</span><span class="ss">:key</span> <span class="ss">:value</span> <span class="ss">:text</span> <span class="s">&quot;Value&quot;</span><span class="p">}]</span>
+
+           <span class="ss">:rows</span>    <span class="p">[{</span><span class="ss">:var</span> <span class="s">&quot;Offset&quot;</span>    <span class="ss">:value</span> <span class="s">&quot;0&quot;</span><span class="p">}</span>
+                     <span class="p">{</span><span class="ss">:var</span> <span class="s">&quot;Size&quot;</span>      <span class="ss">:value</span> <span class="s">&quot;0&quot;</span><span class="p">}</span>
+                     <span class="p">{</span><span class="ss">:var</span> <span class="s">&quot;Timestamp&quot;</span> <span class="ss">:value</span> <span class="s">&quot;0&quot;</span><span class="p">}</span>
+                     <span class="p">{</span><span class="ss">:var</span> <span class="s">&quot;X&quot;</span>         <span class="ss">:value</span> <span class="s">&quot;0&quot;</span><span class="p">}</span>
+                     <span class="p">{</span><span class="ss">:var</span> <span class="s">&quot;Z&quot;</span>         <span class="ss">:value</span> <span class="s">&quot;0&quot;</span><span class="p">}]]))</span>
+</pre></div>
+
+
+<p>Just like the combobox, you supply a model of your data.
+The model is a vector of the columns and the rows, with each being defined in Clojure maps.
+The names you give the columns, you then use in the rows, so you can supply data in any order, and even leave it out for some rows as you need to.
+In this case we could have left the :value out of the rows and we would have been given empty cells instead.
+Updating the values in the table is also really simple, all you need is the update-at! function:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">update-header-info</span> <span class="p">[</span><span class="nv">x</span> <span class="nv">z</span><span class="p">]</span>
+  <span class="p">(</span><span class="nb">when-let </span><span class="p">[</span><span class="nv">c</span> <span class="p">(</span><span class="nf">chunk-model/get-chunk</span> <span class="p">(</span><span class="nf">selected-header</span><span class="p">)</span> <span class="nv">x</span> <span class="nv">z</span><span class="p">)]</span>
+    <span class="p">(</span><span class="nf">st/update-at!</span> <span class="nv">header-info</span> <span class="mi">0</span> <span class="p">{</span><span class="ss">:value</span> <span class="p">(</span><span class="nf">chunk-model/chunk-sector-location</span> <span class="nv">c</span><span class="p">)}</span>
+                               <span class="mi">1</span> <span class="p">{</span><span class="ss">:value</span> <span class="p">(</span><span class="nf">chunk-model/chunk-sector-size</span> <span class="nv">c</span><span class="p">)}</span>
+                               <span class="mi">2</span> <span class="p">{</span><span class="ss">:value</span> <span class="p">(</span><span class="nf">chunk-model/chunk-timestamp</span> <span class="nv">c</span><span class="p">)}</span>
+                               <span class="mi">3</span> <span class="p">{</span><span class="ss">:value</span> <span class="nv">x</span><span class="p">}</span>
+                               <span class="mi">4</span> <span class="p">{</span><span class="ss">:value</span> <span class="nv">z</span><span class="p">})))</span>
+</pre></div>
+
+
+<p>You give the table to update, and then pairs of row index and the value to change.
+We don't need to change the first column (:var) just the second, so we only supply an updated value for that column.</p>
+<h1>Conclusion</h1>
+<p>That ended up being a much bigger post than I expected, and I feel I left so much of the code behind.
+I guess I need to learn to do these things in smaller chunks so I can post more frequently and with smaller amounts of explainations to pack in!</p>
+<p>As always, if you see a mistake in any of the above, from grammer and spelling to coding, clone the Git repo for the blog, make the change and send me a pull request.
+If you have suggestions or questions, raise an issue and I will get back to you.</p>
+<h1>Next Time</h1>
+<p>I'm thinking of taking a break from Clojure &amp; Minecraft for a while.
+It has been a lot of fun, and a great way to improve my Clojure skills, but I am itching to do something different.</p>
+<p>Maybe some microcontrollers, or some Objective-C, I feel I have let both skills stagnate a bit, so it might be time to challenge myself again!</p>
+	<hr/>
+	<h6>Written by <a href="https://nathanwilliams.github.io/author/nathan-williams.html">Nathan Williams</a> in <a href="https://nathanwilliams.github.io/category/programming.html">programming</a> on Wed 15 May 2013. Tags: <a href="https://nathanwilliams.github.io/tag/clojure.html">Clojure</a>, <a href="https://nathanwilliams.github.io/tag/minecraft.html">Minecraft</a>, <a href="https://nathanwilliams.github.io/tag/region.html">Region</a>, <a href="https://nathanwilliams.github.io/tag/seesaw.html">Seesaw</a>, <a href="https://nathanwilliams.github.io/tag/swing.html">Swing</a>, <a href="https://nathanwilliams.github.io/tag/gui.html">Gui</a>, </h6>
+</article>
+
+<hr/>
+						</div>
+						<!-- End Main Content -->
+						<!-- Sidebar -->
+						<aside class="medium-3 hide-for-small-only columns">
+							<div class="panel">
+								<h5>Links</h5>
+								<ul class="side-nav">
+									<li><a href="https://github.com/NathanWilliams/">GitHUb repo</a></li>
+								</ul>
+							</div>
+
+							<div class="panel">
+								<h5>Tags</h5>
+								<ul class="tag-cloud">
+								</ul>
+							</div>
+
+							<div class="panel">
+								<h5>Monthly Archives</h5>
+								<ul class="side-nav">
+											<li><a href="/2016/07/index.html">July 2016 (1)</a></li>
+											<li><a href="/2014/02/index.html">February 2014 (1)</a></li>
+											<li><a href="/2013/05/index.html">May 2013 (1)</a></li>
+											<li><a href="/2013/04/index.html">April 2013 (2)</a></li>
+											<li><a href="/2013/02/index.html">February 2013 (3)</a></li>
+								</ul>
+							</div>
+
+							<div class="panel">
+								<h5>Social</h5>
+								<ul class="side-nav">
+								</ul>
+							</div>
+						</aside>
+						<!-- End Sidebar -->
+					</div>
+
+					<!-- Footer -->
+					<footer class="row">
+						<div class="medium-9 small-12">
+							<hr/>
+							<p class="text-center">Powered by <a href="http://getpelican.com">Pelican</a> and <a href="http://foundation.zurb.com/">Zurb Foundation</a>. Theme by <a href="http://hamaluik.com">Kenton Hamaluik</a>.</p>
+						</div>
+					</footer>
+					<!-- End Footer -->
+				</section>
+				<a class="exit-off-canvas"></a>
+			</div><!--off-canvas inner-->
+		</div><!--off-canvas wrap-->
+
+		<script src="https://nathanwilliams.github.io/theme/js/jquery.js"></script>
+		<script src="https://nathanwilliams.github.io/theme/js/foundation.min.js"></script>
+		<script>
+			$(document).foundation();
+		</script>
+	</body>
+</html>
